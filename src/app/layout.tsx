@@ -2,8 +2,12 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Strategic Feed",
-  description: "Precision intelligence.",
+  title: "Strategic Feed & Briefing Hub",
+  description: "Precision executive intelligence & strategic PM feed.",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export const viewport: Viewport = {
