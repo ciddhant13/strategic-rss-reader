@@ -34,7 +34,6 @@ export function decodeHtmlEntities(str: string): string {
     .replace(/&#(\d+);/g, (_, dec) => {
       const code = parseInt(dec, 10);
       if (isNaN(code)) return "";
-      // Normalize smart quotes to standard clean quotes if desired, or char code
       if (code === 8216 || code === 8217) return "'";
       if (code === 8220 || code === 8221) return '"';
       if (code === 8230) return "...";
@@ -114,14 +113,12 @@ function extractLink(val: any): string {
   return "";
 }
 
-export async function fetchAndParseFeed(
-  source: FeedSource
-): Promise<ArticleItem[]> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12-second timeout
+async function fetchRawXml(url: string, timeoutMs = 12000): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    const response = await fetch(source.url, {
+  try {
+    const res = await fetch(url, {
       signal: controller.signal,
       headers: {
         "User-Agent":
@@ -130,126 +127,144 @@ export async function fetchAndParseFeed(
           "application/rss+xml, application/atom+xml, application/xml, text/xml, */*",
       },
     });
-
+    if (!res.ok) return "";
+    return await res.text();
+  } catch {
+    return "";
+  } finally {
     clearTimeout(timeoutId);
+  }
+}
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} fetching ${source.url}`);
-    }
+function parseRawXmlItems(xmlData: string): any[] {
+  if (!xmlData || !xmlData.trim()) return [];
+  let parsed: any;
+  try {
+    parsed = xmlParser.parse(xmlData);
+  } catch {
+    return [];
+  }
+  if (!parsed || typeof parsed !== "object") return [];
 
-    const xmlData = await response.text();
-    if (!xmlData || xmlData.trim().length === 0) {
-      return [];
-    }
+  if (parsed.rss && parsed.rss.channel) {
+    const items = parsed.rss.channel.item;
+    return Array.isArray(items) ? items : items ? [items] : [];
+  }
+  if (parsed.feed) {
+    const entries = parsed.feed.entry;
+    return Array.isArray(entries) ? entries : entries ? [entries] : [];
+  }
+  if (parsed["rdf:RDF"]) {
+    const items = parsed["rdf:RDF"].item;
+    return Array.isArray(items) ? items : items ? [items] : [];
+  }
+  return [];
+}
 
-    let parsed: any;
-    try {
-      parsed = xmlParser.parse(xmlData);
-    } catch (parseErr: any) {
-      console.warn(`XML parse warning for ${source.name}:`, parseErr);
-      return [];
-    }
-
-    if (!parsed || typeof parsed !== "object") {
-      return [];
-    }
-
+export async function fetchAndParseFeed(
+  source: FeedSource
+): Promise<ArticleItem[]> {
+  try {
     let rawItems: any[] = [];
 
-    // RSS 2.0
-    if (parsed.rss && parsed.rss.channel) {
-      const items = parsed.rss.channel.item;
-      if (Array.isArray(items)) {
-        rawItems = items;
-      } else if (items) {
-        rawItems = [items];
+    // For high-frequency WordPress feeds like SaaStr, fetch up to 4 pages in parallel
+    // to capture in-depth teardowns and "5 Interesting Learnings" without being drowned out by short daily posts
+    if (source.url.includes("saastr.com")) {
+      const baseUrl = source.url.split("?")[0].replace(/\/$/, "");
+      const urls = [
+        `${baseUrl}/`,
+        `${baseUrl}/?paged=2`,
+        `${baseUrl}/?paged=3`,
+        `${baseUrl}/?paged=4`,
+      ];
+      const xmlPages = await Promise.all(urls.map((u) => fetchRawXml(u)));
+      for (const xml of xmlPages) {
+        rawItems.push(...parseRawXmlItems(xml));
       }
-    }
-    // Atom
-    else if (parsed.feed) {
-      const entries = parsed.feed.entry;
-      if (Array.isArray(entries)) {
-        rawItems = entries;
-      } else if (entries) {
-        rawItems = [entries];
-      }
-    }
-    // RDF / RSS 1.0
-    else if (parsed["rdf:RDF"]) {
-      const items = parsed["rdf:RDF"].item;
-      if (Array.isArray(items)) {
-        rawItems = items;
-      } else if (items) {
-        rawItems = [items];
-      }
+    } else {
+      const xml = await fetchRawXml(source.url);
+      rawItems = parseRawXmlItems(xml);
     }
 
-    const articles: ArticleItem[] = rawItems
-      .filter((item) => item && typeof item === "object")
-      .map((item, index) => {
-        const rawTitle =
-          extractText(item.title) || `Dispatch #${index + 1}`;
-        const title = decodeHtmlEntities(rawTitle);
+    // Deduplicate items by link or title
+    const seen = new Set<string>();
+    const uniqueItems: any[] = [];
+    for (const item of rawItems) {
+      if (!item || typeof item !== "object") continue;
+      const link = extractLink(item.link);
+      const title = extractText(item.title);
+      const key = (link || title).toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueItems.push(item);
+      }
+    }
 
-        const link =
-          extractLink(item.link) || source.websiteUrl || source.url;
+    const articles: ArticleItem[] = uniqueItems.map((item, index) => {
+      const rawTitle = extractText(item.title) || `Dispatch #${index + 1}`;
+      const title = decodeHtmlEntities(rawTitle);
 
-        const rawContent =
-          extractText(item["content:encoded"]) ||
-          extractText(item.content) ||
-          extractText(item.description) ||
-          extractText(item.summary) ||
-          "";
+      const link = extractLink(item.link) || source.websiteUrl || source.url;
 
-        const snippet = stripHtml(rawContent).slice(0, 320);
+      const rawContent =
+        extractText(item["content:encoded"]) ||
+        extractText(item.content) ||
+        extractText(item.description) ||
+        extractText(item.summary) ||
+        "";
 
-        const pubDateRaw =
-          item.pubDate ||
-          item.published ||
-          item.updated ||
-          item["dc:date"] ||
-          new Date().toISOString();
+      const snippet = stripHtml(rawContent).slice(0, 320);
 
-        let publishedAt = new Date().toISOString();
-        try {
-          const d = new Date(pubDateRaw);
-          if (!isNaN(d.getTime())) {
-            publishedAt = d.toISOString();
-          }
-        } catch {
-          publishedAt = new Date().toISOString();
+      const pubDateRaw =
+        item.pubDate ||
+        item.published ||
+        item.updated ||
+        item["dc:date"] ||
+        new Date().toISOString();
+
+      let publishedAt = new Date().toISOString();
+      try {
+        const d = new Date(pubDateRaw);
+        if (!isNaN(d.getTime())) {
+          publishedAt = d.toISOString();
         }
+      } catch {
+        publishedAt = new Date().toISOString();
+      }
 
-        const rawAuthor =
-          extractText(item["dc:creator"]) ||
-          extractText(item.author?.name || item.author) ||
-          source.author;
-        const author = decodeHtmlEntities(rawAuthor);
+      const rawAuthor =
+        extractText(item["dc:creator"]) ||
+        extractText(item.author?.name || item.author) ||
+        source.author;
+      const author = decodeHtmlEntities(rawAuthor);
 
-        const wordCount = stripHtml(rawContent).split(/\s+/).filter(Boolean).length;
-        const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+      const wordCount = stripHtml(rawContent).split(/\s+/).filter(Boolean).length;
+      const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
 
-        const imageUrl = extractImage(item, rawContent);
+      const imageUrl = extractImage(item, rawContent);
 
-        return {
-          id: `${source.id}-${index}-${encodeURIComponent(title.slice(0, 25))}`,
-          title,
-          link,
-          publishedAt,
-          author,
-          sourceId: source.id,
-          sourceName: decodeHtmlEntities(source.name),
-          pillar: source.pillar,
-          contentSnippet: snippet,
-          contentHtml: rawContent,
-          readingTimeMinutes,
-          imageUrl,
-        };
-      });
+      return {
+        id: `${source.id}-${index}-${encodeURIComponent(title.slice(0, 25))}`,
+        title,
+        link,
+        publishedAt,
+        author,
+        sourceId: source.id,
+        sourceName: decodeHtmlEntities(source.name),
+        pillar: source.pillar,
+        contentSnippet: snippet,
+        contentHtml: rawContent,
+        readingTimeMinutes,
+        imageUrl,
+      };
+    });
 
     return articles;
   } catch (error: any) {
-    console.error(`Error parsing feed ${source.name} (${source.url}):`, error?.message || error);
+    console.error(
+      `Error parsing feed ${source.name} (${source.url}):`,
+      error?.message || error
+    );
     throw error;
   }
 }
