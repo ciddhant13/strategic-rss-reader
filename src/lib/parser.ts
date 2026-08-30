@@ -1,5 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { ArticleItem, FeedSource } from "@/types";
+import { discoverFeedUrl } from "@/lib/discover";
 
 const xmlParser = new XMLParser({
   ignoreAttributes: false,
@@ -184,6 +185,15 @@ export async function fetchAndParseFeed(
     } else {
       const xml = await fetchRawXml(source.url);
       rawItems = parseRawXmlItems(xml);
+
+      // Auto-Discovery fallback: If rawItems is empty, check if source.url is a website with a hidden RSS feed
+      if (rawItems.length === 0) {
+        const discovered = await discoverFeedUrl(source.url);
+        if (discovered && discovered.feedUrl && discovered.feedUrl !== source.url) {
+          const discXml = await fetchRawXml(discovered.feedUrl);
+          rawItems = parseRawXmlItems(discXml);
+        }
+      }
     }
 
     // Deduplicate items by link or title
