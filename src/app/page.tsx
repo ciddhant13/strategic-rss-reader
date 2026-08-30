@@ -246,6 +246,9 @@ export default function HomePage() {
               isSynthesizing={activeArticle ? synthesizingIds.has(activeArticle.id) : false}
               articleWidth={articleWidth}
               onToggleWidth={() => setArticleWidth(w => w === "standard" ? "wide" : "standard")}
+              hasAuth={Boolean(apiKey || passcode)}
+              onSavePasscode={handleSavePasscode}
+              onOpenSettings={() => setIsSettingsOpen(true)}
             />
           </div>
         </main>
