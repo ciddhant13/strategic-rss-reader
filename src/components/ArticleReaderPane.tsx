@@ -179,9 +179,6 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 <p className="text-[14px] font-medium text-textPrimary">
                   Extracting strategic insights...
                 </p>
-                <p className="text-[12px] text-textSecondary mt-1">
-                  Powered by Gemini Flash
-                </p>
               </div>
             ) : article.synthesis ? (
               <StrategicSynthesisCard synthesis={article.synthesis} />

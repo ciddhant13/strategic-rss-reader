@@ -3,6 +3,7 @@
 import React from "react";
 import { StrategicSynthesis } from "@/types";
 import { Target, Lightbulb, Brain } from "lucide-react";
+import { decodeHtmlEntities } from "@/lib/parser";
 
 interface StrategicSynthesisCardProps {
   synthesis: StrategicSynthesis;
@@ -24,7 +25,7 @@ export const StrategicSynthesisCard: React.FC<StrategicSynthesisCardProps> = ({
           </h5>
         </div>
         <p className="text-[14px] leading-relaxed">
-          {synthesis.strategicThesis}
+          {decodeHtmlEntities(synthesis.strategicThesis)}
         </p>
       </div>
 
@@ -39,7 +40,7 @@ export const StrategicSynthesisCard: React.FC<StrategicSynthesisCardProps> = ({
             </h5>
           </div>
           <p className="text-[14px] leading-relaxed text-textSecondary">
-            {synthesis.productMarketImplication}
+            {decodeHtmlEntities(synthesis.productMarketImplication)}
           </p>
         </div>
 
@@ -52,7 +53,7 @@ export const StrategicSynthesisCard: React.FC<StrategicSynthesisCardProps> = ({
             </h5>
           </div>
           <p className="text-[14px] leading-relaxed text-accent italic">
-            {synthesis.mentalModelApplied}
+            {decodeHtmlEntities(synthesis.mentalModelApplied)}
           </p>
         </div>
       </div>
@@ -65,11 +66,14 @@ export const StrategicSynthesisCard: React.FC<StrategicSynthesisCardProps> = ({
           </h5>
           <ul className="space-y-3">
             {synthesis.keyTakeaways.map((t, i) => (
-              <li key={i} className="flex items-start gap-3 text-[14px] leading-relaxed text-textSecondary">
+              <li
+                key={i}
+                className="flex items-start gap-3 text-[14px] leading-relaxed text-textSecondary"
+              >
                 <span className="flex items-center justify-center w-5 h-5 rounded bg-background border border-border text-textPrimary text-[11px] font-medium shrink-0 mt-0.5">
                   {i + 1}
                 </span>
-                <span className="pt-0.5">{t}</span>
+                <span className="pt-0.5">{decodeHtmlEntities(t)}</span>
               </li>
             ))}
           </ul>

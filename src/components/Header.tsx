@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { RefreshCw, Search, PanelLeft } from "lucide-react";
 
 interface HeaderProps {
@@ -20,6 +20,24 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   isSidebarOpen = true,
 }) => {
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Global Cmd+K / Ctrl+K keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      } else if (e.key === "Escape" && document.activeElement === searchInputRef.current) {
+        searchInputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <header className="bg-background border-b border-border shrink-0 h-14 flex items-center justify-between px-4 sm:px-6 z-20">
       {/* Brand & Sidebar Toggle */}
@@ -45,17 +63,23 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Global Search */}
+      {/* Global Search with Cmd+K */}
       <div className="flex-1 max-w-md hidden sm:block px-4">
         <div className="relative group">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-textSecondary group-focus-within:text-textPrimary transition-colors" />
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search dispatches..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-surface hover:bg-surfaceHover border border-border focus:border-borderHover rounded-md text-[13px] text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-1 focus:ring-borderHover transition-all shadow-glass"
+            className="w-full pl-9 pr-12 py-1.5 bg-surface hover:bg-surfaceHover border border-border focus:border-borderHover rounded-md text-[13px] text-textPrimary placeholder:text-textSecondary focus:outline-none focus:ring-1 focus:ring-borderHover transition-all shadow-glass"
           />
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+            <kbd className="text-[10px] font-mono text-textMuted bg-background/80 border border-border px-1.5 py-0.5 rounded shadow-sm">
+              ⌘K
+            </kbd>
+          </div>
         </div>
       </div>
 

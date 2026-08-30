@@ -1,4 +1,5 @@
 import { StrategicSynthesis } from "@/types";
+import { decodeHtmlEntities } from "@/lib/parser";
 
 // Free tier strictly supports Flash models with 1500 RPD (Pro models have limit: 0 on free tier)
 const FLASH_MODEL_PRIORITY = [
@@ -136,13 +137,15 @@ Return ONLY valid JSON.
   try {
     const parsed = JSON.parse(cleanedText);
     return {
-      strategicThesis: parsed.strategicThesis || "Analysis generated.",
-      productMarketImplication:
-        parsed.productMarketImplication || "Implications analyzed.",
-      mentalModelApplied:
-        parsed.mentalModelApplied || "Strategic Framework applied.",
+      strategicThesis: decodeHtmlEntities(parsed.strategicThesis || "Analysis generated."),
+      productMarketImplication: decodeHtmlEntities(
+        parsed.productMarketImplication || "Implications analyzed."
+      ),
+      mentalModelApplied: decodeHtmlEntities(
+        parsed.mentalModelApplied || "Strategic Framework applied."
+      ),
       keyTakeaways: Array.isArray(parsed.keyTakeaways)
-        ? parsed.keyTakeaways
+        ? parsed.keyTakeaways.map((t: string) => decodeHtmlEntities(String(t)))
         : [
             "Focus on core business model leverage.",
             "Evaluate second-order impacts on product strategy.",
@@ -153,7 +156,7 @@ Return ONLY valid JSON.
   } catch (err) {
     console.error("Failed to parse Gemini response as JSON:", rawText);
     return {
-      strategicThesis: rawText.slice(0, 300),
+      strategicThesis: decodeHtmlEntities(rawText.slice(0, 300)),
       productMarketImplication: "Review full article for detailed implications.",
       mentalModelApplied: "First-Principles Thinking & Strategic Positioning",
       keyTakeaways: [
