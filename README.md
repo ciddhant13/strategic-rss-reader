@@ -2,8 +2,6 @@
 
 A high-signal, custom intelligence briefing and RSS feed reader built for Product Leaders and Senior Product Managers (SPMs) to cultivate a strategic edge in **Product Strategy**, **B2B SaaS Economics**, **B2C Platforms & Marketplaces**, and **Decision-Making Mental Models**.
 
-![Clean UI](https://raw.githubusercontent.com/ciddhant13/strategic-rss-reader/main/public/preview.png)
-
 ---
 
 ## 🌟 Strategic Focus Pillars
