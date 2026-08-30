@@ -37,6 +37,7 @@ export default function HomePage() {
   const [passcode, setPasscode] = useState("");
   const [synthesizingIds, setSynthesizingIds] = useState<Set<string>>(new Set());
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isLensOpen, setIsLensOpen] = useState(false);
   const { theme, setTheme, articleWidth, setArticleWidth } = usePreferences();
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function HomePage() {
     }
   }, []);
 
-  // Keyboard shortcut listener for '[' to toggle sidebar
+  // Keyboard shortcut listener for '[' (sidebar) and ']' (PM Lens)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -67,12 +68,17 @@ export default function HomePage() {
           localStorage.setItem("rss_sidebar_open", String(next));
           return next;
         });
+      } else if (e.key === "]") {
+        e.preventDefault();
+        setIsLensOpen((prev) => !prev);
+      } else if (e.key === "Escape") {
+        if (isLensOpen) setIsLensOpen(false);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [isLensOpen]);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen((prev) => {
@@ -80,6 +86,16 @@ export default function HomePage() {
       localStorage.setItem("rss_sidebar_open", String(next));
       return next;
     });
+  };
+
+  const handleToggleLens = async () => {
+    const nextState = !isLensOpen;
+    setIsLensOpen(nextState);
+
+    // Auto-synthesize on opening if not synthesized yet and has auth
+    if (nextState && activeArticle && !activeArticle.synthesis && (apiKey || passcode)) {
+      handleSynthesize(activeArticle);
+    }
   };
 
   const fetchFeeds = useCallback(async (currentFeeds: FeedSource[]) => {
@@ -220,6 +236,14 @@ export default function HomePage() {
         onSearchChange={setSearchQuery}
         onToggleSidebar={handleToggleSidebar}
         isSidebarOpen={isSidebarOpen}
+        activeArticle={activeArticle}
+        isLensOpen={isLensOpen}
+        onToggleLens={handleToggleLens}
+        isSynthesizing={activeArticle ? synthesizingIds.has(activeArticle.id) : false}
+        articleWidth={articleWidth}
+        onToggleWidth={() => setArticleWidth((w) => (w === "standard" ? "wide" : "standard"))}
+        isMobileReaderOpen={isMobileReaderOpen}
+        onBackToList={() => setIsMobileReaderOpen(false)}
       />
 
       {/* Main App Layout */}
@@ -356,10 +380,11 @@ export default function HomePage() {
               onSynthesize={handleSynthesize}
               isSynthesizing={activeArticle ? synthesizingIds.has(activeArticle.id) : false}
               articleWidth={articleWidth}
-              onToggleWidth={() => setArticleWidth(w => w === "standard" ? "wide" : "standard")}
               hasAuth={Boolean(apiKey || passcode)}
               onSavePasscode={handleSavePasscode}
               onOpenSettings={() => setIsSettingsOpen(true)}
+              isLensOpen={isLensOpen}
+              onToggleLens={handleToggleLens}
             />
           </div>
         </main>
