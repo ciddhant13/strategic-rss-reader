@@ -8,16 +8,36 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { title, content, sourceName, author, customApiKey, accessPasscode } = body;
 
+    const serverApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     const serverPasscode = process.env.APP_ACCESS_PASSWORD;
     const clientPasscode = req.headers.get("x-app-passcode") || accessPasscode;
 
-    // If server has set an APP_ACCESS_PASSWORD and no custom BYOK key is provided:
+    // Case 1: Client didn't provide a personal key, and server has no environment key configured (e.g. localhost without .env.local)
+    if (!customApiKey && !serverApiKey) {
+      return NextResponse.json(
+        {
+          error:
+            "No server API key configured. Please enter your personal Gemini API key in Settings (gear icon), or configure GEMINI_API_KEY in your server environment.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Case 2: Server has an access password configured, and client is trying to use the server key without a valid passcode
     if (serverPasscode && !customApiKey) {
-      if (!clientPasscode || clientPasscode !== serverPasscode) {
+      if (!clientPasscode) {
         return NextResponse.json(
           {
-            error:
-              "Protected feed: Access passcode is required to use the server AI quota. Please enter it in Preferences (gear icon).",
+            error: "Access passcode is required to use the server AI quota.",
+          },
+          { status: 401 }
+        );
+      }
+
+      if (clientPasscode !== serverPasscode) {
+        return NextResponse.json(
+          {
+            error: "Incorrect passcode. Please check your password or configure your own API key in Settings.",
           },
           { status: 401 }
         );

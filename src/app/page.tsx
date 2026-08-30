@@ -73,15 +73,20 @@ export default function HomePage() {
 
   useEffect(() => { fetchFeeds(feeds); }, [fetchFeeds, feeds]);
 
-  const handleSynthesize = async (article: ArticleItem) => {
-    if (article.synthesis) return;
+  const handleSynthesize = async (
+    article: ArticleItem,
+    overridePasscode?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (article.synthesis) return { success: true };
+    const effectivePasscode = overridePasscode !== undefined ? overridePasscode : passcode;
+    
     setSynthesizingIds((p) => new Set(p).add(article.id));
     try {
       const res = await fetch("/api/synthesize", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-app-passcode": passcode || "",
+          "x-app-passcode": effectivePasscode || "",
         },
         body: JSON.stringify({
           title: article.title,
@@ -89,21 +94,39 @@ export default function HomePage() {
           sourceName: article.sourceName,
           author: article.author,
           customApiKey: apiKey || undefined,
-          accessPasscode: passcode || undefined,
+          accessPasscode: effectivePasscode || undefined,
         }),
       });
+
+      const d = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
         if (res.status === 401) {
-          setIsSettingsOpen(true);
+          // Invalidate bad saved passcode
+          setPasscode("");
+          savePasscode("");
         }
-        throw new Error(d.error || "Synthesis failed.");
+        return {
+          success: false,
+          error: d.error || "Synthesis failed. Please verify your passcode or API key.",
+        };
       }
-      const { synthesis }: { synthesis: StrategicSynthesis } = await res.json();
+
+      const { synthesis }: { synthesis: StrategicSynthesis } = d;
       saveSynthesisToCache(article.id, synthesis);
       setArticles((prev) => prev.map((a) => (a.id === article.id ? { ...a, synthesis } : a)));
+
+      // If an override passcode was supplied and succeeded, persist it
+      if (overridePasscode) {
+        handleSavePasscode(overridePasscode);
+      }
+
+      return { success: true };
     } catch (err: any) {
-      alert(err.message);
+      return {
+        success: false,
+        error: err.message || "Network error. Please try again.",
+      };
     } finally {
       setSynthesizingIds((p) => { const n = new Set(p); n.delete(article.id); return n; });
     }
