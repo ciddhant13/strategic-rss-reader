@@ -10,20 +10,60 @@ const xmlParser = new XMLParser({
   parseTagValue: false,
 });
 
-function stripHtml(html: string): string {
-  if (!html) return "";
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
+export function decodeHtmlEntities(str: string): string {
+  if (!str) return "";
+  return str
+    // Common named entities
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lsquo;/g, "'")
+    .replace(/&rsquo;/g, "'")
+    .replace(/&ldquo;/g, '"')
+    .replace(/&rdquo;/g, '"')
+    .replace(/&hellip;/g, "...")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&copy;/g, "©")
+    .replace(/&reg;/g, "®")
+    .replace(/&trade;/g, "™")
+    // Decimal numeric character references (e.g. &#8217; -> ', &#8220; -> ", &#39; -> ')
+    .replace(/&#(\d+);/g, (_, dec) => {
+      const code = parseInt(dec, 10);
+      if (isNaN(code)) return "";
+      // Normalize smart quotes to standard clean quotes if desired, or char code
+      if (code === 8216 || code === 8217) return "'";
+      if (code === 8220 || code === 8221) return '"';
+      if (code === 8230) return "...";
+      if (code === 8211) return "–";
+      if (code === 8212) return "—";
+      return String.fromCharCode(code);
+    })
+    // Hexadecimal numeric character references (e.g. &#x2019; -> ')
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      const code = parseInt(hex, 16);
+      if (isNaN(code)) return "";
+      if (code === 0x2018 || code === 0x2019) return "'";
+      if (code === 0x201c || code === 0x201d) return '"';
+      if (code === 0x2026) return "...";
+      if (code === 0x2013) return "–";
+      if (code === 0x2014) return "—";
+      return String.fromCharCode(code);
+    });
+}
+
+function stripHtml(html: string): string {
+  if (!html) return "";
+  const cleaned = html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+  return decodeHtmlEntities(cleaned);
 }
 
 function extractImage(item: any, rawContent: string): string | undefined {
@@ -147,8 +187,10 @@ export async function fetchAndParseFeed(
     const articles: ArticleItem[] = rawItems
       .filter((item) => item && typeof item === "object")
       .map((item, index) => {
-        const title =
+        const rawTitle =
           extractText(item.title) || `Dispatch #${index + 1}`;
+        const title = decodeHtmlEntities(rawTitle);
+
         const link =
           extractLink(item.link) || source.websiteUrl || source.url;
 
@@ -178,10 +220,11 @@ export async function fetchAndParseFeed(
           publishedAt = new Date().toISOString();
         }
 
-        const author =
+        const rawAuthor =
           extractText(item["dc:creator"]) ||
           extractText(item.author?.name || item.author) ||
           source.author;
+        const author = decodeHtmlEntities(rawAuthor);
 
         const wordCount = stripHtml(rawContent).split(/\s+/).filter(Boolean).length;
         const readingTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
@@ -195,7 +238,7 @@ export async function fetchAndParseFeed(
           publishedAt,
           author,
           sourceId: source.id,
-          sourceName: source.name,
+          sourceName: decodeHtmlEntities(source.name),
           pillar: source.pillar,
           contentSnippet: snippet,
           contentHtml: rawContent,
