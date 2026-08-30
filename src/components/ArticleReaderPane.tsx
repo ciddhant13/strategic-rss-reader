@@ -99,6 +99,23 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
               )}
             </div>
 
+            {/* Background Synthesis Loading Card */}
+            {isSynthesizing && !article.synthesis && !isLensOpen && (
+              <div className="mb-8 p-3.5 bg-surface border border-border/80 rounded-lg shadow-glass flex items-center gap-3 animate-pulse">
+                <div className="p-1.5 bg-background border border-border rounded shrink-0">
+                  <Loader2 className="w-3.5 h-3.5 text-accent animate-spin" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-textSecondary mb-0.5">
+                    Synthesizing PM Lens...
+                  </h4>
+                  <p className="text-[12px] text-textMuted">
+                    Extracting strategic thesis & mental models in the background.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Fast Inline Strategic Summary Card (Clicking slides open Inspector) */}
             {article.synthesis && !isLensOpen && (
               <div
@@ -111,7 +128,7 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wider text-textSecondary">
-                      Core Strategic Thesis
+                      Strategic Thesis
                     </h4>
                     <span className="text-[11px] text-textMuted group-hover:text-textPrimary transition-colors flex items-center gap-0.5">
                       Open PM Lens &rarr;

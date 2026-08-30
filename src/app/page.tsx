@@ -222,9 +222,22 @@ export default function HomePage() {
     [articles, selectedArticleId]
   );
 
+  // Auto-run PM Lens insights whenever an article is opened, if authenticated and not yet synthesized
+  useEffect(() => {
+    if (!activeArticle) return;
+    if (activeArticle.synthesis) return;
+    if (synthesizingIds.has(activeArticle.id)) return;
+    if (apiKey || passcode) {
+      handleSynthesize(activeArticle);
+    }
+  }, [activeArticle?.id, apiKey, passcode, synthesizingIds]);
+
   const handleSelectArticle = (a: ArticleItem) => {
     setSelectedArticleId(a.id);
     setIsMobileReaderOpen(true);
+    if (!a.synthesis && !synthesizingIds.has(a.id) && (apiKey || passcode)) {
+      handleSynthesize(a);
+    }
   };
 
   return (
