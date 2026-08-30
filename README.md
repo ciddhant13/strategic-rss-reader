@@ -15,15 +15,17 @@ A high-signal, custom intelligence briefing and RSS feed reader built for Produc
 
 ## 🚀 Key Features
 
-- **⚡ Linear / Raycast Aesthetic**: Minimalist, dark/light theme designed with glass borders, layered surfaces, and micro-interactions.
+- **⚡ Linear / Raycast Aesthetic**: Minimalist dark and light themes with glass borders, layered surfaces, and fluid micro-interactions.
 - **📰 Editorial Typography**: Uses **Newsreader** serif for editorial headings paired with **Inter** for clean UI controls.
-- **🧠 The Strategic PM Lens (AI Synthesis)**: Generates structured, high-leverage strategic breakdowns powered by Gemini 2.0/1.5 Flash:
+- **🧠 The Strategic PM Lens (AI Synthesis)**: Structured, high-leverage strategic breakdowns powered by Gemini Flash:
   1. *Core Strategic Thesis*
   2. *Product & Market Implication (B2B SaaS / B2C)*
   3. *Mental Model to Apply*
   4. *Numbered Key Strategic Takeaways*
 - **🆓 100% Free Tier Guaranteed**: Direct integration with Google AI Studio free tier (up to 1,500 requests/day at $0 cost) with automatic browser-side caching.
-- **🔒 Passcode-Protected Server Deployment**: Protect your private Gemini API quota when deployed publicly by requiring an app passcode.
+- **🔒 Passcode-Protected Server Deployment**: Safeguard your private Gemini API quota when deployed publicly by requiring a secret access passcode.
+- **⌨️ Keyboard Shortcuts**: Press **`[`** anytime to collapse or expand the navigation sidebar.
+- **📦 OPML 2.0 Export & Import**: Backup, export, or migrate your entire curated feed collection in 1 click across devices and RSS clients.
 - **📐 Dynamic Reader Column Width**: Seamlessly switch between Standard (700px) and Expanded Wide (1000px) reading layouts.
 - **📂 Custom Feed Manager**: Add custom RSS links, toggle sources, or reset to curated defaults directly from the interface.
 
@@ -50,8 +52,11 @@ A high-signal, custom intelligence briefing and RSS feed reader built for Produc
 2. Import the repository into [Vercel](https://vercel.com/new).
 3. Under **Project Settings → Environment Variables**, add:
    - `GEMINI_API_KEY`: *(Your free API key from [Google AI Studio](https://aistudio.google.com/app/apikey))*
-   - `APP_ACCESS_PASSWORD`: *(A secret PIN/password of your choice to protect your quota)*
+   - `APP_ACCESS_PASSWORD`: *(A secret PIN or password of your choice to protect your quota)*
 4. Click **Deploy**.
+
+### First-Time Access:
+Once deployed, open your live Vercel URL on your phone or laptop, click **Preferences (gear icon)** or the inline unlock prompt on any article, enter your **App Passcode**, and your device will remain authenticated permanently!
 
 ---
 
@@ -63,4 +68,4 @@ A high-signal, custom intelligence briefing and RSS feed reader built for Produc
 - **Typography**: Newsreader (Serif) & Inter (Sans)
 - **AI Engine**: Google Generative AI (Gemini 2.0 / 1.5 Flash)
 - **Icons**: Lucide React
-- **Parser**: Fast XML Parser for RSS, Atom, and RDF feeds
+- **Parser**: Fast XML Parser for RSS, Atom, RDF, and OPML 2.0
