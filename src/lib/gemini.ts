@@ -58,7 +58,7 @@ export async function generateStrategicSynthesis(
 
   const prompt = `
 You are an executive strategic advisor to a Senior Product Manager (SPM).
-Your goal is to extract high-leverage, non-obvious strategic insights, business model analysis, and mental models from the following publication.
+Your goal is to extract high-leverage, faithful insights and applicable frameworks from the following publication.
 
 Article Title: "${title}"
 Author/Source: ${author || sourceName}
@@ -67,15 +67,20 @@ Content:
 ${content.slice(0, 8000)}
 """
 
+CRITICAL GUARDRAILS & INSTRUCTIONS:
+1. STRICT THESIS GROUNDING: The "strategicThesis" MUST be derived strictly and exclusively from the text above. Do NOT hallucinate, assume unmentioned context, or force a grand macro/business model dynamic if the article is focused on tactical, operational, or execution matters. Faithfully capture what the author is actually arguing.
+2. SYNTHESIS IN IMPLICATIONS: Use "productMarketImplication" and "mentalModelApplied" to connect the author's argument to broader product leadership, roadmap prioritization, B2B SaaS economics (pricing/NRR/GTM), or B2C platform dynamics.
+3. NO FLUFF: Be crisp, rigorous, and direct. Avoid conversational filler or generic truisms.
+
 Provide your strategic analysis strictly in valid JSON format matching this exact schema:
 {
-  "strategicThesis": "1-2 crisp, rigorous sentences describing the core underlying strategic shift, thesis, or business model dynamics presented.",
-  "productMarketImplication": "2-3 sentences explaining the tangible implications for product strategy, roadmaps, B2B SaaS economics (pricing/retention/GTM) or B2C consumer dynamics (network effects/growth loops).",
-  "mentalModelApplied": "Name of 1-2 primary mental models or strategic frameworks directly applicable here (e.g., Aggregation Theory, Second-Order Thinking, Switching Costs, Local Maximum, Asymmetric Upside, Jobs To Be Done, Network Effects, Inversion) followed by a 1-sentence note on how to use it.",
+  "strategicThesis": "1-2 crisp sentences capturing the author's primary argument, central thesis, or core insight strictly as argued in the text.",
+  "productMarketImplication": "2-3 actionable sentences explaining the tangible implications for product strategy, roadmap prioritization, B2B SaaS economics, or B2C growth loops.",
+  "mentalModelApplied": "Name of 1-2 primary mental models or strategic frameworks directly applicable to the author's thesis (e.g., Aggregation Theory, Second-Order Thinking, Inversion, Switching Costs, Local Maximum, Jobs To Be Done, Asymmetric Upside, Network Effects) followed by a 1-sentence note on how an SPM should apply it.",
   "keyTakeaways": [
-    "Takeaway 1: High-signal executive point on market or technology dynamics.",
-    "Takeaway 2: High-signal point on product prioritization or execution trade-off.",
-    "Takeaway 3: High-signal point on long-term competitive moat or strategic edge."
+    "Takeaway 1: High-signal executive point directly grounded in the article's evidence or argument.",
+    "Takeaway 2: High-signal point on product prioritization or execution trade-offs.",
+    "Takeaway 3: High-signal point on competitive moats or strategic edge."
   ]
 }
 
