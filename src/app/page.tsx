@@ -19,7 +19,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleReaderPane } from "@/components/ArticleReaderPane";
 import { FeedManagerModal } from "@/components/FeedManagerModal";
 import { SettingsModal } from "@/components/SettingsModal";
-import { Loader2, Inbox } from "lucide-react";
+import { Loader2, Inbox, Rss, Settings2 } from "lucide-react";
 import { usePreferences } from "@/hooks/usePreferences";
 
 export default function HomePage() {
@@ -36,13 +36,51 @@ export default function HomePage() {
   const [apiKey, setApiKey] = useState("");
   const [passcode, setPasscode] = useState("");
   const [synthesizingIds, setSynthesizingIds] = useState<Set<string>>(new Set());
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { theme, setTheme, articleWidth, setArticleWidth } = usePreferences();
 
   useEffect(() => {
     setFeeds(loadSavedFeeds());
     setApiKey(loadApiKey());
     setPasscode(loadPasscode());
+    const savedSidebar = localStorage.getItem("rss_sidebar_open");
+    if (savedSidebar !== null) {
+      setIsSidebarOpen(savedSidebar === "true");
+    }
   }, []);
+
+  // Keyboard shortcut listener for '[' to toggle sidebar
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+      if (e.key === "[") {
+        e.preventDefault();
+        setIsSidebarOpen((prev) => {
+          const next = !prev;
+          localStorage.setItem("rss_sidebar_open", String(next));
+          return next;
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen((prev) => {
+      const next = !prev;
+      localStorage.setItem("rss_sidebar_open", String(next));
+      return next;
+    });
+  };
 
   const fetchFeeds = useCallback(async (currentFeeds: FeedSource[]) => {
     setIsLoadingFeeds(true);
@@ -102,7 +140,6 @@ export default function HomePage() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          // Invalidate bad saved passcode
           setPasscode("");
           savePasscode("");
         }
@@ -116,7 +153,6 @@ export default function HomePage() {
       saveSynthesisToCache(article.id, synthesis);
       setArticles((prev) => prev.map((a) => (a.id === article.id ? { ...a, synthesis } : a)));
 
-      // If an override passcode was supplied and succeeded, persist it
       if (overridePasscode) {
         handleSavePasscode(overridePasscode);
       }
@@ -180,18 +216,22 @@ export default function HomePage() {
       <Header
         onRefresh={() => fetchFeeds(feeds)}
         isLoading={isLoadingFeeds}
-        onOpenFeedManager={() => setIsFeedManagerOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        hasApiKey={!!apiKey}
+        onToggleSidebar={handleToggleSidebar}
+        isSidebarOpen={isSidebarOpen}
       />
 
       {/* Main App Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Navigation Sidebar */}
-        <aside className="w-56 shrink-0 hidden lg:flex flex-col border-r border-border bg-surface">
-          <div className="py-4">
+        <aside
+          className={`shrink-0 hidden lg:flex flex-col border-r border-border bg-surface justify-between transition-all duration-200 ease-in-out overflow-hidden ${
+            isSidebarOpen ? "w-56" : "w-0 border-r-0 opacity-0 pointer-events-none"
+          }`}
+        >
+          {/* Top: Views */}
+          <div className="py-4 w-56">
             <div className="px-5 mb-2">
               <h2 className="text-[11px] font-semibold text-textSecondary uppercase tracking-wider">
                 Views
@@ -203,15 +243,46 @@ export default function HomePage() {
               counts={pillarCounts}
             />
           </div>
+
+          {/* Bottom Left Toolbar: Sources & Preferences */}
+          <div className="p-3 border-t border-border space-y-1 bg-surface w-56">
+            <button
+              onClick={() => setIsFeedManagerOpen(true)}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-md text-[12px] font-medium text-textSecondary hover:text-textPrimary hover:bg-surfaceHover transition-colors"
+              title="Add or manage RSS feeds"
+            >
+              <div className="flex items-center gap-2">
+                <Rss className="w-3.5 h-3.5 text-accent" />
+                <span>Sources</span>
+              </div>
+              <span className="text-[11px] text-textMuted font-mono">
+                {feeds.filter((f) => f.enabled).length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-md text-[12px] font-medium text-textSecondary hover:text-textPrimary hover:bg-surfaceHover transition-colors"
+              title="Preferences & Security"
+            >
+              <div className="flex items-center gap-2">
+                <Settings2 className="w-3.5 h-3.5" />
+                <span>Preferences</span>
+              </div>
+              {Boolean(apiKey || passcode) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+              )}
+            </button>
+          </div>
         </aside>
 
         {/* Middle List */}
         <aside className={`w-full md:w-[340px] shrink-0 flex flex-col border-r border-border bg-background ${
           isMobileReaderOpen ? "hidden md:flex" : "flex"
         }`}>
-          {/* Mobile Pillar Filter */}
-          <div className="lg:hidden border-b border-border bg-surface overflow-x-auto">
-             <div className="flex p-2 gap-1 w-max">
+          {/* Mobile Pillar Filter & Quick Actions */}
+          <div className="lg:hidden border-b border-border bg-surface flex items-center justify-between px-2 py-1.5">
+             <div className="flex gap-1 overflow-x-auto pr-2">
                 {["all", "product_strategy", "b2b_saas", "b2c_platforms", "mental_models"].map((pId) => {
                    const isActive = activePillar === pId;
                    const labels: Record<string, string> = {
@@ -221,14 +292,31 @@ export default function HomePage() {
                      <button
                        key={pId}
                        onClick={() => setActivePillar(pId as StrategicPillar)}
-                       className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
-                         isActive ? "bg-border text-textPrimary shadow-glass" : "text-textSecondary hover:text-textPrimary hover:bg-surfaceHover"
+                       className={`px-2.5 py-1 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors ${
+                         isActive ? "bg-border text-textPrimary shadow-glass" : "text-textSecondary hover:text-textPrimary"
                        }`}
                      >
                        {labels[pId]}
                      </button>
                    );
                 })}
+             </div>
+
+             <div className="flex items-center gap-1 shrink-0 pl-1 border-l border-border">
+                <button
+                  onClick={() => setIsFeedManagerOpen(true)}
+                  className="p-1.5 rounded text-textSecondary hover:text-textPrimary hover:bg-surfaceHover"
+                  title="Sources"
+                >
+                  <Rss className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setIsSettingsOpen(true)}
+                  className="p-1.5 rounded text-textSecondary hover:text-textPrimary hover:bg-surfaceHover"
+                  title="Preferences"
+                >
+                  <Settings2 className="w-3.5 h-3.5" />
+                </button>
              </div>
           </div>
 
@@ -277,7 +365,12 @@ export default function HomePage() {
         </main>
       </div>
 
-      <FeedManagerModal isOpen={isFeedManagerOpen} onClose={() => setIsFeedManagerOpen(false)} feeds={feeds} onSaveFeeds={handleSaveFeeds} />
+      <FeedManagerModal
+        isOpen={isFeedManagerOpen}
+        onClose={() => setIsFeedManagerOpen(false)}
+        feeds={feeds}
+        onSaveFeeds={handleSaveFeeds}
+      />
       <SettingsModal 
         isOpen={isSettingsOpen} 
         onClose={() => setIsSettingsOpen(false)} 
