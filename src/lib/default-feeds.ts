@@ -23,6 +23,16 @@ export const DEFAULT_FEEDS: FeedSource[] = [
     enabled: true,
   },
   {
+    id: "saastr-deep-dives",
+    name: "SaaStr Deep Dives",
+    url: "https://www.saastr.com/category/deep-dives/feed/",
+    websiteUrl: "https://www.saastr.com/category/deep-dives/",
+    pillar: "b2b_saas",
+    description: "In-depth teardowns of public SaaS metrics, scaling case studies, and GTM breakdowns.",
+    author: "Jason Lemkin & SaaStr",
+    enabled: true,
+  },
+  {
     id: "tomtunguz",
     name: "Tomasz Tunguz",
     url: "https://tomtunguz.com/index.xml",
