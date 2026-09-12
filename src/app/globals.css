@@ -3,53 +3,118 @@
 @tailwind utilities;
 
 @layer base {
+  /* ==========================================================================
+     Material Design 3 Expressive - Light Palette (Authentic Warm Sandstone)
+     ========================================================================== */
   :root {
-    --background: 255 255 255;
-    --surface: 249 249 249;
-    --surface-hover: 243 243 243;
-    --border: 234 234 234;
-    --border-hover: 212 212 212;
-    --text-primary: 23 23 23;
-    --text-secondary: 115 115 115;
-    --text-muted: 163 163 163;
-    --accent: 0 0 0;
-    --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
-    --popover-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+    /* Base Warm Sandstone Canvas */
+    --md-surface: 232 219 204; /* #E8DBCF Warm Sandstone Canvas */
+    --md-surface-dim: 220 206 190;
+    --md-surface-bright: 255 255 255;
+    
+    /* Surface Containers */
+    --md-surface-container-lowest: 255 255 255; /* #FFFFFF Pure white */
+    --md-surface-container-low: 252 248 242; /* #FCF8F2 Warm ivory panel container */
+    --md-surface-container: 245 237 227; /* #F5EDE3 Feed stream container — clearly distinct on canvas */
+    --md-surface-container-high: 255 255 255; /* #FFFFFF Card surface */
+    --md-surface-container-highest: 239 230 219; /* #EFE6DB Pills & elevated chips */
+
+    /* Typography & Outlines */
+    --md-on-surface: 28 24 20; /* #1C1814 Deep Charcoal Ink */
+    --md-on-surface-variant: 88 77 66; /* #584D42 Medium Contrast */
+    --md-outline: 148 133 118;
+    --md-outline-variant: 215 201 185; /* #D7C9B9 Clean subtle border */
+
+    /* Primary: Expressive Terracotta Coral */
+    --md-primary: 216 90 56; /* #D85A38 Rich Coral */
+    --md-on-primary: 255 255 255;
+    --md-primary-container: 252 231 220; /* #FCE7DC Soft Peach Chip */
+    --md-on-primary-container: 120 40 13; /* #78280D Deep Coral Text */
+
+    /* Secondary: Sage Green Container */
+    --md-secondary: 68 96 72; /* #446048 */
+    --md-on-secondary: 255 255 255;
+    --md-secondary-container: 214 228 208; /* #D6E4D0 */
+    --md-on-secondary-container: 18 46 21; /* #122E15 */
+
+    /* Tertiary: Soft Lilac / Violet Container */
+    --md-tertiary: 104 68 138; /* #68448A */
+    --md-on-tertiary: 255 255 255;
+    --md-tertiary-container: 233 220 248; /* #E9DCF8 */
+    --md-on-tertiary-container: 41 20 68; /* #291444 */
+
+    /* Error */
+    --md-error: 186 26 26;
+    --md-error-container: 255 218 214;
+    --md-on-error-container: 65 0 2;
   }
 
+  /* ==========================================================================
+     Material Design 3 Expressive - Dark Palette (Deep Obsidian Slate & Amber Coral)
+     ========================================================================== */
   .dark {
-    --background: 0 0 0;
-    --surface: 14 14 14;
-    --surface-hover: 26 26 26;
-    --border: 38 38 38;
-    --border-hover: 51 51 51;
-    --text-primary: 237 237 237;
-    --text-secondary: 135 135 135;
-    --text-muted: 82 82 91;
-    --accent: 255 255 255;
-    --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-    --popover-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 12px 24px -8px rgba(0, 0, 0, 0.8);
+    /* Base Surface Canvas */
+    --md-surface: 11 12 16; /* #0B0C10 Deep Pitch Slate Canvas */
+    --md-surface-dim: 8 9 12;
+    --md-surface-bright: 42 44 56;
+    
+    /* Surface Containers - Clearly elevated from #0B0C10 canvas */
+    --md-surface-container-lowest: 18 19 26; /* #12131A Deepest dark */
+    --md-surface-container-low: 31 33 44; /* #1F212C Sidebar, Reader & PM Lens panels */
+    --md-surface-container: 24 26 34; /* #181A22 Middle feed stream tray */
+    --md-surface-container-high: 40 42 55; /* #282A37 Distinct elevated cards */
+    --md-surface-container-highest: 48 51 66; /* #303342 Interactive pills */
+
+    /* Typography & Outlines - Soft, non-harsh borders */
+    --md-on-surface: 240 236 230; /* #F0ECE6 Linen White */
+    --md-on-surface-variant: 172 168 160; /* #ACA8A0 Balanced Secondary */
+    --md-outline: 82 86 104; /* #525668 */
+    --md-outline-variant: 38 40 52; /* #262834 Soft ambient dark borders */
+
+    /* Primary: Radiant Terracotta Coral */
+    --md-primary: 255 146 117; /* #FF9275 */
+    --md-on-primary: 82 28 12;
+    --md-primary-container: 74 33 19; /* #4A2113 */
+    --md-on-primary-container: 255 204 186;
+
+    /* Secondary: Radiant Sage */
+    --md-secondary: 172 206 180; /* #ACCEB4 */
+    --md-on-secondary: 32 58 36;
+    --md-secondary-container: 45 68 49; /* #2D4431 */
+    --md-on-secondary-container: 213 236 208;
+
+    /* Tertiary: Radiant Lavender */
+    --md-tertiary: 219 188 255; /* #DBBCFF */
+    --md-on-tertiary: 61 37 86;
+    --md-tertiary-container: 66 45 88; /* #422D58 */
+    --md-on-tertiary-container: 237 224 255;
+
+    /* Error */
+    --md-error: 255 180 171;
+    --md-error-container: 147 0 10;
+    --md-on-error-container: 255 218 214;
   }
 }
 
 html, body {
   height: 100%;
   overflow: hidden;
-  background-color: rgb(var(--background));
-  color: rgb(var(--text-primary));
+  background-color: rgb(var(--md-surface));
+  color: rgb(var(--md-on-surface));
+  font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background-color: rgba(var(--accent) / 0.15);
-  color: rgb(var(--accent));
+  background-color: rgb(var(--md-primary-container));
+  color: rgb(var(--md-on-primary-container));
 }
 
-/* Linear-style minimalist scrollbars */
+/* Material 3 Expressive Smooth Scrollbars */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -57,83 +122,84 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--border));
-  border: 3px solid transparent;
-  background-clip: padding-box;
+  background: rgb(var(--md-outline-variant) / 0.6);
   border-radius: 9999px;
+  transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--border-hover));
-  border: 3px solid transparent;
-  background-clip: padding-box;
+  background: rgb(var(--md-outline));
 }
 
-/* Reader typography */
+/* Material 3 Expressive Editorial Reader Typography */
 .reader-content {
-  line-height: 1.65;
-  font-size: 1rem;
-  color: rgb(var(--text-secondary));
+  line-height: 1.8;
+  font-size: 1.0625rem;
+  color: rgb(var(--md-on-surface-variant));
 }
 
 .reader-content p {
-  margin-bottom: 1.5em;
+  margin-bottom: 1.6em;
 }
 
 .reader-content h1,
 .reader-content h2,
 .reader-content h3 {
-  font-family: 'Newsreader', Georgia, serif;
-  font-weight: 500;
-  color: rgb(var(--text-primary));
+  font-family: 'Plus Jakarta Sans', Inter, -apple-system, sans-serif;
+  font-weight: 700;
+  color: rgb(var(--md-on-surface));
   margin-top: 2em;
-  margin-bottom: 0.75em;
+  margin-bottom: 0.6em;
   letter-spacing: -0.02em;
   line-height: 1.3;
 }
 
-.reader-content h1 { font-size: 1.5rem; }
-.reader-content h2 { font-size: 1.25rem; }
-.reader-content h3 { font-size: 1.125rem; }
+.reader-content h1 { font-size: 1.65rem; }
+.reader-content h2 { font-size: 1.35rem; }
+.reader-content h3 { font-size: 1.15rem; }
 
 .reader-content a {
-  color: rgb(var(--text-primary));
+  color: rgb(var(--md-primary));
+  font-weight: 600;
   text-decoration: underline;
-  text-decoration-color: rgb(var(--text-muted));
-  text-underline-offset: 3px;
-  transition: text-decoration-color 0.2s ease;
+  text-decoration-color: rgb(var(--md-primary) / 0.4);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .reader-content a:hover {
-  text-decoration-color: rgb(var(--text-primary));
+  text-decoration-color: rgb(var(--md-primary));
 }
 
 .reader-content blockquote {
-  border-left: 2px solid rgb(var(--border-hover));
-  padding-left: 1.25rem;
-  margin: 1.75rem 0;
-  color: rgb(var(--text-secondary));
-  font-style: italic;
+  border-left: 3px solid rgb(var(--md-primary));
+  background-color: rgb(var(--md-surface-container-low));
+  border-radius: 0 1rem 1rem 0;
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+  color: rgb(var(--md-on-surface));
+  font-weight: 500;
 }
 
 .reader-content img {
-  border-radius: 6px;
+  border-radius: 1.25rem;
   margin: 2rem 0;
-  border: 1px solid rgb(var(--border));
+  border: 1px solid rgb(var(--md-outline-variant) / 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   max-width: 100%;
 }
 
 .reader-content ul, .reader-content ol {
-  margin-left: 1.25rem;
-  margin-bottom: 1.5em;
+  margin-left: 1.5rem;
+  margin-bottom: 1.6em;
 }
 
 .reader-content ul { list-style-type: disc; }
 .reader-content ol { list-style-type: decimal; }
-.reader-content li { margin-bottom: 0.5em; }
+.reader-content li { margin-bottom: 0.6em; }
 
 .reader-content hr {
   border: none;
-  border-top: 1px solid rgb(var(--border));
-  margin: 3rem 0;
+  border-top: 1px solid rgb(var(--md-outline-variant) / 0.5);
+  margin: 3.5rem 0;
 }

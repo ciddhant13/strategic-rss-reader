@@ -8,7 +8,6 @@ import {
   X,
   Plus,
   Trash2,
-  Check,
   Globe,
   RotateCcw,
   Rss,
@@ -225,7 +224,6 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
     };
 
     reader.readAsText(file);
-    // Reset file input so user can import the same file again if needed
     e.target.value = "";
   };
 
@@ -253,25 +251,25 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-surface border border-border rounded-xl shadow-popover w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+      <div className="bg-[#FAF6F0] dark:bg-[#1E202B] border border-md-outline-variant/30 dark:border-white/[0.08] rounded-3xl shadow-popover dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-surface">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded bg-background border border-border flex items-center justify-center">
-              <Rss className="w-3.5 h-3.5 text-accent" />
+        <div className="px-6 py-5 border-b border-md-outline-variant/20 dark:border-white/[0.06] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-md-primary flex items-center justify-center shadow-xs">
+              <Rss className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-[14px] text-textPrimary">
-                Sources & Publications
+              <h3 className="font-bold text-[16px] text-md-on-surface leading-tight">
+                Sources &amp; Publications
               </h3>
-              <p className="text-[11px] text-textSecondary">
-                Manage curated subscriptions, add custom website feeds, or backup OPML
+              <p className="text-[12px] text-md-on-surface-variant">
+                Manage curated subscriptions, add website feeds, or backup OPML
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-textSecondary hover:text-textPrimary hover:bg-border transition-colors"
+            className="w-8 h-8 rounded-full bg-[#EFE7DC] dark:bg-[#282A35] hover:bg-[#E8DDD0] dark:hover:bg-[#313442] text-md-on-surface-variant hover:text-md-on-surface flex items-center justify-center transition-all shadow-xs"
           >
             <X className="w-4 h-4" />
           </button>
@@ -288,28 +286,28 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
 
         {/* Success Alert Banner */}
         {successMessage && (
-          <div className="mx-6 mt-4 p-2.5 bg-accent/10 border border-accent/20 rounded-md text-[12px] text-accent flex items-center gap-2 animate-in fade-in duration-150">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <div className="mx-6 mt-4 p-3 bg-md-primary-container text-md-on-primary-container rounded-2xl text-[12.5px] font-semibold flex items-center gap-2 animate-in fade-in duration-150 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-md-primary" />
             <span>{successMessage}</span>
           </div>
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-background">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
           {/* Actions bar */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsAdding(!isAdding)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-background text-[12px] font-medium rounded-md hover:bg-accent/90 transition-colors shadow-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-md-primary text-white text-[12.5px] font-semibold rounded-full hover:bg-md-primary/90 transition-all shadow-xs"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-4 h-4" />
                 <span>{isAdding ? "Close Form" : "Add Website or Feed"}</span>
               </button>
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-textSecondary hover:text-textPrimary bg-surface border border-border hover:border-borderHover rounded-md transition-colors shadow-glass"
+                className="flex items-center gap-1.5 px-3.5 py-2 text-[12px] font-semibold text-md-on-surface-variant hover:text-md-on-surface bg-[#EFE7DC] dark:bg-[#151720] border border-transparent dark:border-white/[0.06] hover:bg-[#EAE0D3] dark:hover:bg-[#1C1E2A] rounded-full transition-colors shadow-2xs"
                 title="Import OPML or JSON feed backup"
               >
                 <Upload className="w-3.5 h-3.5" />
@@ -318,7 +316,7 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
 
               <button
                 onClick={handleExportOpml}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-textSecondary hover:text-textPrimary bg-surface border border-border hover:border-borderHover rounded-md transition-colors shadow-glass"
+                className="flex items-center gap-1.5 px-3.5 py-2 text-[12px] font-semibold text-md-on-surface-variant hover:text-md-on-surface bg-[#EFE7DC] dark:bg-[#151720] border border-transparent dark:border-white/[0.06] hover:bg-[#EAE0D3] dark:hover:bg-[#1C1E2A] rounded-full transition-colors shadow-2xs"
                 title="Export all feeds to standard OPML"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -328,7 +326,7 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
 
             <button
               onClick={reset}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-textSecondary hover:text-textPrimary hover:bg-surface rounded-md transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-semibold text-md-on-surface-variant hover:text-md-on-surface hover:bg-[#EFE7DC] dark:hover:bg-[#151720] rounded-full transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Reset</span>
@@ -339,26 +337,26 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
           {isAdding && (
             <form
               onSubmit={handleAddFeed}
-              className="p-4 bg-surface border border-border rounded-lg space-y-3.5 shadow-glass animate-in fade-in duration-200"
+              className="p-5 bg-[#F4EAE0] dark:bg-[#151720] border border-md-outline-variant/30 dark:border-white/[0.06] rounded-3xl space-y-4 shadow-sm animate-in fade-in duration-200"
             >
-              <div className="flex items-center justify-between pb-2 border-b border-border">
-                <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-accent" />
-                  <h4 className="text-[12px] font-medium text-textPrimary uppercase tracking-wider">
+              <div className="flex items-center justify-between pb-3 border-b border-md-outline-variant/20 dark:border-white/[0.06]">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-md-primary" />
+                  <h4 className="text-[13px] font-bold text-md-on-surface uppercase tracking-wider">
                     Add Website or RSS Link
                   </h4>
                 </div>
-                <span className="text-[11px] text-textSecondary">
-                  Auto-discovers RSS feeds from regular websites
+                <span className="text-[11px] font-medium text-md-on-surface-variant">
+                  Auto-discovers RSS feeds from websites
                 </span>
               </div>
 
               {error && (
-                <p className="text-[#ef4444] text-[12px] font-medium">{error}</p>
+                <p className="text-md-error text-[12px] font-semibold">{error}</p>
               )}
 
               <div>
-                <label className="block text-[11px] font-medium text-textSecondary mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-md-on-surface-variant mb-1.5">
                   Website URL or RSS Feed Link *
                 </label>
                 <div className="relative">
@@ -368,41 +366,41 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
                     value={newUrl}
                     onChange={(e) => setNewUrl(e.target.value)}
                     onBlur={(e) => handleAutoDiscover(e.target.value)}
-                    className="w-full pl-3 pr-24 py-2 bg-background border border-border focus:border-borderHover rounded-md text-[13px] text-textPrimary placeholder:text-textMuted focus:outline-none shadow-glass"
+                    className="w-full pl-4 pr-24 py-2.5 bg-md-surface-container-lowest border border-md-outline-variant focus:border-md-primary rounded-full text-[13px] text-md-on-surface placeholder:text-md-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-md-primary/20 shadow-xs"
                     autoFocus
                   />
                   <button
                     type="button"
                     onClick={() => handleAutoDiscover(newUrl)}
                     disabled={isDiscovering || !newUrl.trim()}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 text-[11px] font-medium rounded text-textSecondary hover:text-textPrimary bg-surface border border-border hover:bg-surfaceHover transition-colors flex items-center gap-1 disabled:opacity-40"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 text-[11px] font-bold rounded-full text-md-on-tertiary-container bg-md-tertiary-container hover:bg-md-tertiary-container/80 transition-colors flex items-center gap-1.5 disabled:opacity-40 shadow-xs"
                   >
                     {isDiscovering ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <Sparkles className="w-3 h-3 text-accent" />
+                      <Sparkles className="w-3.5 h-3.5" />
                     )}
                     <span>Detect</span>
                   </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-[11px] font-medium text-textSecondary mb-1">
-                    Publication Name (Auto-filled)
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-md-on-surface-variant mb-1.5">
+                    Publication Name
                   </label>
                   <input
                     placeholder="e.g. The Generalist"
                     type="text"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border focus:border-borderHover rounded-md text-[13px] text-textPrimary placeholder:text-textMuted focus:outline-none shadow-glass"
+                    className="w-full px-4 py-2.5 bg-md-surface-container-lowest border border-md-outline-variant focus:border-md-primary rounded-full text-[13px] text-md-on-surface placeholder:text-md-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-md-primary/20 shadow-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-medium text-textSecondary mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-md-on-surface-variant mb-1.5">
                     Author / Curator
                   </label>
                   <input
@@ -410,13 +408,13 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
                     type="text"
                     value={newAuthor}
                     onChange={(e) => setNewAuthor(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border focus:border-borderHover rounded-md text-[13px] text-textPrimary placeholder:text-textMuted focus:outline-none shadow-glass"
+                    className="w-full px-4 py-2.5 bg-md-surface-container-lowest border border-md-outline-variant focus:border-md-primary rounded-full text-[13px] text-md-on-surface placeholder:text-md-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-md-primary/20 shadow-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-textSecondary mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-md-on-surface-variant mb-1.5">
                   Strategic Pillar
                 </label>
                 <select
@@ -424,35 +422,35 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
                   onChange={(e) =>
                     setNewPillar(e.target.value as StrategicPillar)
                   }
-                  className="w-full px-3 py-2 bg-background border border-border focus:border-borderHover rounded-md text-[13px] text-textPrimary focus:outline-none shadow-glass cursor-pointer"
+                  className="w-full px-4 py-2.5 bg-md-surface-container-lowest border border-md-outline-variant focus:border-md-primary rounded-full text-[13px] text-md-on-surface focus:outline-none focus:ring-2 focus:ring-md-primary/20 shadow-xs cursor-pointer"
                 >
-                  <option value="product_strategy">Product Strategy</option>
+                  <option value="product_strategy">Product Strategy & Leadership</option>
                   <option value="b2b_saas">B2B SaaS & Economics</option>
                   <option value="b2c_platforms">B2C & Tech Platforms</option>
                   <option value="mental_models">Mental Models & Thinking</option>
                 </select>
               </div>
 
-              <div className="flex justify-end gap-2 pt-1">
+              <div className="flex justify-end gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => {
                     setIsAdding(false);
                     setError(null);
                   }}
-                  className="px-3 py-1.5 text-[12px] font-medium text-textSecondary hover:text-textPrimary hover:bg-surface rounded-md transition-colors"
+                  className="px-4 py-2 text-[12px] font-semibold text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container rounded-full transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isDiscovering}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-accent text-background text-[12px] font-medium rounded-md hover:bg-accent/90 transition-colors shadow-sm disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2 bg-md-primary text-md-on-primary text-[12.5px] font-semibold rounded-full hover:bg-md-primary/90 transition-all shadow-sm disabled:opacity-50"
                 >
                   {isDiscovering ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-4 h-4" />
                   )}
                   <span>Add Source</span>
                 </button>
@@ -473,34 +471,34 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
             if (!pillarFeeds || pillarFeeds.length === 0) return null;
 
             return (
-              <div key={pillarKey} className="space-y-2.5">
+              <div key={pillarKey} className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-[11px] font-semibold text-textSecondary uppercase tracking-wider">
+                  <h4 className="text-[12px] font-bold text-md-on-surface-variant uppercase tracking-wider">
                     {pillarTitles[pillarKey]}
                   </h4>
-                  <span className="text-[11px] text-textMuted font-mono">
+                  <span className="px-2.5 py-0.5 rounded-full bg-md-surface-container text-[11px] font-semibold text-md-on-surface-variant tabular-nums">
                     {pillarFeeds.filter((f) => f.enabled).length} active
                   </span>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {pillarFeeds.map((feed) => (
                     <div
                       key={feed.id}
-                      className="p-3 bg-surface hover:bg-surfaceHover border border-border rounded-lg flex items-center justify-between gap-3 transition-colors shadow-glass group"
+                      className="p-3.5 bg-white dark:bg-[#151720] hover:bg-[#FDFBF7] dark:hover:bg-[#1C1E2A] border border-md-outline-variant/30 dark:border-white/[0.06] rounded-2xl flex items-center justify-between gap-3 transition-colors shadow-2xs group"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-medium text-[13px] text-textPrimary truncate">
+                          <span className="font-semibold text-[13.5px] text-md-on-surface truncate">
                             {feed.name}
                           </span>
                           {feed.isCustom && (
-                            <span className="px-1.5 py-0.2 bg-background border border-border text-[9px] font-medium text-accent rounded">
+                            <span className="px-2 py-0.5 bg-md-primary-container text-[9.5px] font-bold text-md-on-primary-container rounded-full">
                               Custom
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-textSecondary truncate">
+                        <p className="text-[11.5px] text-md-on-surface-variant truncate">
                           {feed.description || feed.url}
                         </p>
                       </div>
@@ -511,25 +509,20 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
                             href={feed.websiteUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded text-textMuted hover:text-textPrimary hover:bg-background transition-colors"
+                            className="p-2 rounded-full text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container dark:hover:bg-[#2A2C38] transition-colors"
                             title="Visit website"
                           >
-                            <Globe className="w-3.5 h-3.5" />
+                            <Globe className="w-4 h-4" />
                           </a>
                         )}
 
                         <button
                           onClick={() => toggle(feed.id)}
-                          className={`px-2 py-1 rounded text-[11px] font-medium transition-colors border ${
+                          className={`px-3 py-1 rounded-full text-[11.5px] font-semibold transition-all ${
                             feed.enabled
-                              ? "bg-accent text-background border-accent shadow-sm"
-                              : "bg-background text-textMuted border-border hover:text-textPrimary"
+                              ? "bg-md-primary text-white shadow-xs"
+                              : "bg-[#EFE7DC] dark:bg-[#2A2C37] text-md-on-surface-variant hover:text-md-on-surface"
                           }`}
-                          title={
-                            feed.enabled
-                              ? "Disable this source"
-                              : "Enable this source"
-                          }
                         >
                           {feed.enabled ? "Active" : "Disabled"}
                         </button>
@@ -537,10 +530,10 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
                         {feed.isCustom && (
                           <button
                             onClick={() => del(feed.id)}
-                            className="p-1.5 rounded text-textMuted hover:text-[#ef4444] hover:bg-background transition-colors"
+                            className="p-2 rounded-full text-md-on-surface-variant hover:text-md-error hover:bg-red-500/10 transition-colors"
                             title="Delete custom source"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         )}
                       </div>
@@ -553,13 +546,13 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-border flex items-center justify-between bg-surface">
-          <span className="text-[12px] text-textSecondary font-mono">
+        <div className="px-6 py-4 border-t border-md-outline-variant/20 dark:border-md-outline-variant/20 flex items-center justify-between">
+          <span className="text-[12.5px] text-md-on-surface-variant font-medium">
             {feedList.filter((f) => f.enabled).length} of {feedList.length} sources active
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 bg-accent text-background text-[12px] font-medium rounded-md hover:bg-accent/90 transition-colors shadow-sm"
+            className="px-6 py-2 bg-md-primary text-white text-[13px] font-semibold rounded-full hover:bg-md-primary/90 transition-all shadow-sm"
           >
             Done
           </button>
