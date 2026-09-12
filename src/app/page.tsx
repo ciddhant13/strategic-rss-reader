@@ -375,7 +375,7 @@ export default function HomePage() {
             {!isSidebarOpen && (
               <button
                 onClick={handleToggleSidebar}
-                className="w-9 h-9 rounded-full text-md-on-surface-variant hover:text-md-on-surface bg-white dark:bg-[#22242E] hover:bg-md-surface-container dark:hover:bg-[#2A2C38] transition-all shrink-0 shadow-2xs border border-md-outline-variant/40 dark:border-md-outline-variant/20 flex items-center justify-center group"
+                className="w-9 h-9 rounded-full text-md-on-surface-variant hover:text-md-on-surface bg-white dark:bg-[#22242E] hover:bg-md-surface-container dark:hover:bg-[#2A2C38] transition-all shrink-0 shadow-2xs border border-md-outline-variant/40 dark:border-transparent flex items-center justify-center group"
                 title="Expand Sidebar ([)"
               >
                 <PanelLeftOpen className="w-4 h-4 text-md-on-surface-variant group-hover:text-md-primary transition-colors" />
@@ -390,10 +390,10 @@ export default function HomePage() {
                 placeholder="Search dispatches..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-9 pl-9 pr-14 bg-white dark:bg-[#22242E] border border-md-outline-variant/40 dark:border-md-outline-variant/20 focus:border-md-primary/70 rounded-full text-[13px] text-md-on-surface placeholder:text-md-on-surface-variant/70 focus:outline-none focus:ring-2 focus:ring-md-primary/20 shadow-2xs transition-all"
+                className="w-full h-9 pl-9 pr-14 bg-white dark:bg-[#22242E] border border-md-outline-variant/40 dark:border-transparent focus:border-md-primary/70 dark:focus:border-md-primary/50 rounded-full text-[13px] text-md-on-surface placeholder:text-md-on-surface-variant/70 focus:outline-none focus:ring-2 focus:ring-md-primary/20 shadow-2xs transition-all"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
-                <kbd className="text-[11px] font-semibold text-md-on-surface-variant bg-[#EAE0D3] dark:bg-[#2F313D] px-2 py-0.5 rounded-full border border-black/5 dark:border-white/5 flex items-center gap-0.5 shadow-2xs">
+                <kbd className="text-[11px] font-semibold text-md-on-surface-variant bg-[#EAE0D3] dark:bg-[#2A2C37] px-2 py-0.5 rounded-full border border-black/5 dark:border-transparent flex items-center gap-0.5 shadow-2xs">
                   <span>⌘</span>
                   <span>K</span>
                 </kbd>
@@ -403,7 +403,7 @@ export default function HomePage() {
             <button
               onClick={() => fetchFeeds(feeds)}
               disabled={isLoadingFeeds}
-              className="w-9 h-9 rounded-full text-md-on-surface-variant hover:text-md-on-surface bg-white dark:bg-[#22242E] hover:bg-md-surface-container dark:hover:bg-[#2A2C38] transition-colors shrink-0 shadow-2xs border border-md-outline-variant/40 dark:border-md-outline-variant/20 flex items-center justify-center"
+              className="w-9 h-9 rounded-full text-md-on-surface-variant hover:text-md-on-surface bg-white dark:bg-[#22242E] hover:bg-md-surface-container dark:hover:bg-[#2A2C38] transition-colors shrink-0 shadow-2xs border border-md-outline-variant/40 dark:border-transparent flex items-center justify-center"
               title="Refresh Stream"
             >
               <RefreshCw className={`w-4 h-4 ${isLoadingFeeds ? "animate-spin text-md-primary" : ""}`} />

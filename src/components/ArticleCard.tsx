@@ -3,11 +3,23 @@
 import React from "react";
 import { ArticleItem } from "@/types";
 import { Sparkles, Clock } from "lucide-react";
+import { formatDistanceToNowStrict, isValid } from "date-fns";
 
 interface ArticleCardProps {
   article: ArticleItem;
   isSelected: boolean;
   onSelect: (article: ArticleItem) => void;
+}
+
+function formatArticleAge(publishedAt?: string): string {
+  if (!publishedAt) return "";
+  try {
+    const d = new Date(publishedAt);
+    if (!isValid(d)) return "";
+    return formatDistanceToNowStrict(d, { addSuffix: true });
+  } catch {
+    return "";
+  }
 }
 
 // M3 Expressive Pill Color System by Source & Pillar
@@ -37,6 +49,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 }) => {
   const readTime = article.readingTimeMinutes || 5;
   const pillColorClasses = getSourcePillStyles(article);
+  const age = formatArticleAge(article.publishedAt);
 
   return (
     <div className="px-3.5 py-1.5">
@@ -77,10 +90,18 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           {article.title}
         </h3>
 
-        {/* Bottom Metadata: Reading Time only (e.g. 5 min with Clock icon) */}
-        <div className="flex items-center gap-1.5 text-[12px] font-medium text-md-on-surface-variant/75">
-          <Clock className="w-3.5 h-3.5 opacity-60 shrink-0" />
-          <span>{readTime} min</span>
+        {/* Bottom Metadata: Age of dispatch & Reading time */}
+        <div className="flex items-center gap-2 text-[12px] font-medium text-md-on-surface-variant/75">
+          {age && (
+            <>
+              <span>{age}</span>
+              <span className="opacity-40">•</span>
+            </>
+          )}
+          <div className="flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5 opacity-60 shrink-0" />
+            <span>{readTime} min</span>
+          </div>
         </div>
       </button>
     </div>
