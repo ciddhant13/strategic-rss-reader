@@ -262,7 +262,7 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
         <div className="px-6 py-5 border-b border-md-outline-variant/20 dark:border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-md-primary flex items-center justify-center shadow-xs">
-              <Rss className="w-4 h-4 text-white" />
+              <Rss className="w-4 h-4 text-white dark:text-[#250F08]" />
             </div>
             <div>
               <h3 className="font-bold text-[16px] text-md-on-surface leading-tight">
@@ -305,9 +305,9 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsAdding(!isAdding)}
-                className="flex items-center gap-2 px-4 py-2 bg-md-primary text-white text-[12.5px] font-semibold rounded-full hover:bg-md-primary/90 transition-all shadow-xs"
+                className="flex items-center gap-2 px-4 py-2 bg-md-primary text-white dark:text-[#250F08] text-[12.5px] font-semibold dark:font-bold rounded-full hover:bg-md-primary/90 transition-all shadow-xs"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 text-white dark:text-[#250F08] dark:stroke-[2.5]" />
                 <span>{isAdding ? "Close Form" : "Add Website or Feed"}</span>
               </button>
 
@@ -451,12 +451,12 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
                 <button
                   type="submit"
                   disabled={isDiscovering}
-                  className="flex items-center gap-2 px-5 py-2 bg-md-primary text-md-on-primary text-[12.5px] font-semibold rounded-full hover:bg-md-primary/90 transition-all shadow-sm disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2 bg-md-primary text-white dark:text-[#250F08] text-[12.5px] font-semibold dark:font-bold rounded-full hover:bg-md-primary/90 transition-all shadow-sm disabled:opacity-50"
                 >
                   {isDiscovering ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-white dark:text-[#250F08]" />
                   ) : (
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 text-white dark:text-[#250F08] dark:stroke-[2.5]" />
                   )}
                   <span>Add Source</span>
                 </button>
@@ -526,7 +526,7 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
                           onClick={() => toggle(feed.id)}
                           className={`px-3 py-1 rounded-full text-[11.5px] font-semibold transition-all ${
                             feed.enabled
-                              ? "bg-md-primary text-white shadow-xs"
+                              ? "bg-md-primary text-white dark:text-[#250F08] shadow-xs font-bold"
                               : "bg-[#EFE7DC] dark:bg-[#2A2C37] text-md-on-surface-variant hover:text-md-on-surface"
                           }`}
                         >
@@ -558,7 +558,7 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
           </span>
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-md-primary text-white text-[13px] font-semibold rounded-full hover:bg-md-primary/90 transition-all shadow-sm"
+            className="px-6 py-2 bg-md-primary text-white dark:text-[#250F08] text-[13px] font-semibold dark:font-bold rounded-full hover:bg-md-primary/90 transition-all shadow-sm"
           >
             Done
           </button>

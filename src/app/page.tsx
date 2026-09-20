@@ -374,7 +374,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between mb-6 px-1">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-2xl bg-md-primary flex items-center justify-center shadow-xs">
-                  <Compass className="w-4.5 h-4.5 text-white" />
+                  <Compass className="w-4.5 h-4.5 text-white dark:text-[#250F08]" />
                 </div>
                 <div>
                   <h1 className="font-bold text-[18px] tracking-tight text-md-on-surface leading-none">
@@ -514,9 +514,9 @@ export default function HomePage() {
                   </kbd>
                   <span className="truncate">Sidebar</span>
                 </div>
-                <div className="flex items-center gap-1.5 min-w-0" title="Press D, L, or S to switch theme">
+                <div className="flex items-center gap-1.5 min-w-0" title="Press S, L, or D to switch theme">
                   <kbd className="min-w-[20px] h-5 px-1.5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[9px] text-md-on-surface flex items-center justify-center shrink-0">
-                    D/L/S
+                    S/L/D
                   </kbd>
                   <span className="truncate">Theme</span>
                 </div>

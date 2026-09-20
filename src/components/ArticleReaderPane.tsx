@@ -154,9 +154,9 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 </kbd>
                 <span className="truncate">Sidebar</span>
               </div>
-              <div className="flex items-center gap-2 min-w-0" title="Press D, L, or S to switch theme">
-                <kbd className="w-9 h-5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[8.5px] text-md-on-surface flex items-center justify-center shrink-0 tracking-tighter">
-                  D/L/S
+              <div className="flex items-center gap-2 min-w-0" title="Press S, L, or D to switch theme">
+                <kbd className="w-9 h-5 bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[8.5px] text-md-on-surface flex items-center justify-center shrink-0 tracking-tighter">
+                  S/L/D
                 </kbd>
                 <span className="truncate">Theme</span>
               </div>
@@ -293,8 +293,8 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 className="mb-8 p-6 bg-[#F7C6AE] dark:bg-[#462E29] rounded-2xl shadow-[0_4px_20px_rgba(216,90,56,0.12)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.45)] hover:shadow-[0_8px_28px_rgba(216,90,56,0.18)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.55)] cursor-pointer transition-all duration-200 ease-m3-standard group"
               >
                 <div className="flex items-center justify-between gap-3 mb-3.5">
-                  <span className="px-3 py-1 rounded-full bg-md-primary text-white text-[11.5px] font-bold inline-flex items-center gap-1.5 shadow-xs">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <span className="px-3 py-1 rounded-full bg-md-primary text-white dark:text-[#250F08] text-[11.5px] font-bold inline-flex items-center gap-1.5 shadow-xs">
+                    <Sparkles className="w-3.5 h-3.5 text-white dark:text-[#250F08]" />
                     <span>Strategic Thesis</span>
                   </span>
                   <button
@@ -302,7 +302,7 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                       e.stopPropagation();
                       if (onToggleLens) onToggleLens();
                     }}
-                    className="px-3.5 py-1 rounded-full text-[11.5px] font-semibold text-md-primary bg-white dark:bg-[#2A1613] border border-md-primary/25 group-hover:bg-md-primary group-hover:text-white transition-all inline-flex items-center gap-1 shadow-xs"
+                    className="px-3.5 py-1 rounded-full text-[11.5px] font-semibold text-md-primary bg-white dark:bg-[#2A1613] border border-md-primary/25 group-hover:bg-md-primary group-hover:text-white dark:group-hover:text-[#250F08] transition-all inline-flex items-center gap-1 shadow-xs"
                   >
                     <span>More Details</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -407,10 +407,10 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 <button
                   type="submit"
                   disabled={!inlinePasscode.trim() || isVerifying}
-                  className="w-full py-2.5 bg-md-primary text-white text-[13px] font-semibold rounded-full hover:bg-md-primary/90 disabled:opacity-40 transition-all flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-2.5 bg-md-primary text-white dark:text-[#250F08] text-[13px] font-semibold dark:font-bold rounded-full hover:bg-md-primary/90 disabled:opacity-40 transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
                   <span>Unlock &amp; Synthesize</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-white dark:text-[#250F08]" />
                 </button>
               </form>
 
@@ -448,9 +448,9 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
               </p>
               <button
                 onClick={onToggleLens}
-                className="flex items-center gap-2 px-5 py-2.5 bg-md-primary text-white text-[13px] font-semibold rounded-full hover:bg-md-primary/90 transition-all shadow-sm"
+                className="flex items-center gap-2 px-5 py-2.5 bg-md-primary text-white dark:text-[#250F08] text-[13px] font-semibold dark:font-bold rounded-full hover:bg-md-primary/90 transition-all shadow-sm"
               >
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-white dark:text-[#250F08]" />
                 <span>Generate PM Lens</span>
               </button>
             </div>
@@ -504,7 +504,7 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                     <button
                       type="submit"
                       disabled={!inlinePasscode.trim()}
-                      className="w-full py-2.5 bg-md-primary text-white text-[13px] font-semibold rounded-full"
+                      className="w-full py-2.5 bg-md-primary text-white dark:text-[#250F08] text-[13px] font-semibold dark:font-bold rounded-full"
                     >
                       Unlock &amp; Synthesize
                     </button>
@@ -534,7 +534,7 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 <div className="py-12 text-center flex flex-col items-center">
                   <button
                     onClick={onToggleLens}
-                    className="px-5 py-2.5 bg-md-primary text-white text-[13px] font-semibold rounded-full"
+                    className="px-5 py-2.5 bg-md-primary text-white dark:text-[#250F08] text-[13px] font-semibold dark:font-bold rounded-full"
                   >
                     Generate PM Lens
                   </button>

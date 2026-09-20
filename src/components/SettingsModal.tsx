@@ -67,7 +67,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <div className="px-6 py-5 border-b border-md-outline-variant/20 dark:border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-md-primary flex items-center justify-center shadow-xs">
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4 text-white dark:text-[#250F08]" />
             </div>
             <div>
               <h3 className="font-bold text-[16px] text-md-on-surface leading-tight">
@@ -99,7 +99,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   Color Theme
                 </label>
                 <span className="text-[11px] font-mono text-md-on-surface-variant/70">
-                  Hotkeys: D / L / S
+                  Hotkeys: S / L / D
                 </span>
               </div>
               <div className="flex p-1 bg-[#EAE0D3] dark:bg-[#151720] border border-md-outline-variant/25 dark:border-white/[0.06] rounded-full gap-1 shadow-2xs">
@@ -215,11 +215,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-6 py-2.5 bg-md-primary text-white text-[12.5px] font-semibold rounded-full hover:bg-md-primary/90 shadow-xs transition-all"
+                  className="flex items-center gap-2 px-6 py-2.5 bg-md-primary text-white dark:text-[#250F08] text-[12.5px] font-semibold dark:font-bold rounded-full hover:bg-md-primary/90 shadow-xs transition-all"
                 >
                   {saved ? (
                     <>
-                      <Check className="w-4 h-4" />
+                      <Check className="w-4 h-4 text-white dark:text-[#250F08]" />
                       <span>Saved</span>
                     </>
                   ) : (
@@ -256,7 +256,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <span className="text-md-on-surface-variant">Toggle PM Lens</span>
               </div>
               <div className="flex items-center gap-2">
-                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[8.5px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0 tracking-tighter">D/L/S</kbd>
+                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[8.5px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0 tracking-tighter">S/L/D</kbd>
                 <span className="text-md-on-surface-variant">Theme switch</span>
               </div>
               <div className="flex items-center gap-2">

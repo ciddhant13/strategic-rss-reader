@@ -146,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({
             disabled={isSynthesizing}
             className={`group flex items-center gap-2 px-4 py-2 rounded-full text-[12.5px] font-bold transition-all duration-200 ease-m3-standard shadow-sm ${
               isLensOpen
-                ? "bg-md-primary text-md-on-primary shadow-md"
+                ? "bg-md-primary text-white dark:text-[#250F08] shadow-md"
                 : "bg-md-tertiary-container text-md-on-tertiary-container hover:shadow hover:scale-102"
             }`}
             title="Toggle PM Lens Inspector (])"
@@ -154,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({
             {isSynthesizing ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <Sparkles className="w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-12" />
+              <Sparkles className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-12 ${isLensOpen ? "text-white dark:text-[#250F08]" : ""}`} />
             )}
             <span>PM Lens</span>
             {activeArticle?.synthesis && !isLensOpen && (
