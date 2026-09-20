@@ -123,7 +123,7 @@ export const SAMPLE_ARTICLES: ArticleItem[] = [
     sourceId: "paul-graham",
     sourceName: "Paul Graham Essays",
     author: "Paul Graham",
-    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 36).toISOString(), // 36h ago
+    publishedAt: "2020-11-01T00:00:00.000Z",
     contentSnippet:
       "To be a successful founder or strategic thinker, you have to be independent-minded. How to recognize conventional wisdom and cultivate independent first-principles judgment.",
     contentHtml: `

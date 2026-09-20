@@ -250,8 +250,14 @@ export const FeedManagerModal: React.FC<FeedManagerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#FAF6F0] dark:bg-[#1E202B] border border-md-outline-variant/30 dark:border-white/[0.08] rounded-3xl shadow-popover dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-[#FAF6F0] dark:bg-[#1E202B] border border-md-outline-variant/30 dark:border-white/[0.08] rounded-3xl shadow-popover dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+      >
         {/* Header */}
         <div className="px-6 py-5 border-b border-md-outline-variant/20 dark:border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-3">

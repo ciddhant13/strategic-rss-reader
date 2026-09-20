@@ -19,6 +19,7 @@ import {
   BrainCircuit,
   Clock,
   Calendar,
+  Command,
 } from "lucide-react";
 import { ArticleWidth } from "@/hooks/usePreferences";
 import { format, isValid } from "date-fns";
@@ -73,7 +74,7 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
   if (!article) {
     return (
       <div className="h-full flex items-center justify-center p-6 bg-md-surface overflow-y-auto">
-        <div className="max-w-md w-full p-8 bg-[#FAF6F0] dark:bg-[#1A1C23] border border-md-outline-variant/30 dark:border-md-outline-variant/20 rounded-3xl text-center shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_28px_rgba(0,0,0,0.35)]">
+        <div className="max-w-md w-full p-8 bg-[#FAF6F0] dark:bg-[#1E202B] rounded-3xl text-center shadow-[0_12px_36px_rgba(0,0,0,0.07)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
           <div className="w-16 h-16 rounded-full bg-md-primary-container/60 dark:bg-md-primary-container/40 flex items-center justify-center mx-auto mb-5 shadow-xs">
             <Compass className="w-8 h-8 text-md-primary" />
           </div>
@@ -85,56 +86,81 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
             Select an article from your curated dispatches to read the full briefing and extract PM insights.
           </p>
 
+          {/* 4 Core Pillars - Clean, consistent badges without variable sources */}
           <div className="grid grid-cols-2 gap-2.5 text-left mb-6">
-            <div className="p-3 bg-md-surface-container rounded-2xl">
-              <div className="flex items-center gap-2 mb-1 text-md-primary font-bold text-[12px]">
+            <div className="p-3 bg-black/[0.025] dark:bg-white/[0.03] rounded-2xl flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-xl bg-[#FCE3D7] dark:bg-[#4E2417] flex items-center justify-center text-[#842E15] dark:text-[#FFCCB8] shrink-0">
                 <TrendingUp className="w-3.5 h-3.5" />
-                <span>Product Strategy</span>
               </div>
-              <p className="text-[11px] text-md-on-surface-variant">Lenny, First Round</p>
+              <span className="text-[12px] font-bold text-md-on-surface leading-tight">Product Strategy</span>
             </div>
 
-            <div className="p-3 bg-md-surface-container rounded-2xl">
-              <div className="flex items-center gap-2 mb-1 text-md-secondary font-bold text-[12px]">
+            <div className="p-3 bg-black/[0.025] dark:bg-white/[0.03] rounded-2xl flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-xl bg-[#DBE8D5] dark:bg-[#243E26] flex items-center justify-center text-[#214322] dark:text-[#CDE4C8] shrink-0">
                 <Building2 className="w-3.5 h-3.5" />
-                <span>B2B SaaS</span>
               </div>
-              <p className="text-[11px] text-md-on-surface-variant">SaaStr, Tunguz</p>
+              <span className="text-[12px] font-bold text-md-on-surface leading-tight">B2B SaaS</span>
             </div>
 
-            <div className="p-3 bg-md-surface-container rounded-2xl">
-              <div className="flex items-center gap-2 mb-1 text-md-on-surface-variant font-bold text-[12px]">
+            <div className="p-3 bg-black/[0.025] dark:bg-white/[0.03] rounded-2xl flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-xl bg-[#DCE7EB] dark:bg-[#1E383F] flex items-center justify-center text-[#1E3F47] dark:text-[#CBE6ED] shrink-0">
                 <Globe className="w-3.5 h-3.5" />
-                <span>Tech Platforms</span>
               </div>
-              <p className="text-[11px] text-md-on-surface-variant">Stratechery, A Chen</p>
+              <span className="text-[12px] font-bold text-md-on-surface leading-tight">Tech Platforms</span>
             </div>
 
-            <div className="p-3 bg-md-surface-container rounded-2xl">
-              <div className="flex items-center gap-2 mb-1 text-md-tertiary font-bold text-[12px]">
+            <div className="p-3 bg-black/[0.025] dark:bg-white/[0.03] rounded-2xl flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-xl bg-[#EADEF7] dark:bg-[#38244E] flex items-center justify-center text-[#4A2D6E] dark:text-[#E9D9FB] shrink-0">
                 <BrainCircuit className="w-3.5 h-3.5" />
-                <span>Mental Models</span>
               </div>
-              <p className="text-[11px] text-md-on-surface-variant">Farnam St, Collab</p>
+              <span className="text-[12px] font-bold text-md-on-surface leading-tight">Mental Models</span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-md-on-surface-variant font-mono">
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-md-surface-container-highest rounded-md font-bold">⌘K</kbd> Search
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-md-surface-container-highest rounded-md font-bold">[</kbd> Sidebar
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-md-surface-container-highest rounded-md font-bold">]</kbd> PM Lens
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-md-surface-container-highest rounded-md font-bold">D / L / S</kbd> Theme
-            </span>
+          {/* Hotkeys Section - Identical to Left Panel */}
+          <div className="p-3.5 rounded-2xl bg-black/[0.025] dark:bg-white/[0.03] text-left">
+            <div className="flex items-center gap-1.5 mb-2.5 px-0.5 text-[10.5px] font-bold text-md-on-surface-variant/70 uppercase tracking-wider">
+              <Command className="w-3 h-3 opacity-60" />
+              <span>Shortcuts</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-[11.5px] text-md-on-surface-variant">
+              <div className="flex items-center gap-2 min-w-0" title="Press ⌘K to search">
+                <kbd className="w-9 h-5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                  ⌘K
+                </kbd>
+                <span className="truncate">Search</span>
+              </div>
+              <div className="flex items-center gap-2 min-w-0" title="Press ] to toggle PM Lens">
+                <kbd className="w-9 h-5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                  ]
+                </kbd>
+                <span className="truncate">PM Lens</span>
+              </div>
+              <div className="flex items-center gap-2 min-w-0" title="Press F to toggle Last 7 Days">
+                <kbd className="w-9 h-5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                  F
+                </kbd>
+                <span className="truncate">7 Days</span>
+              </div>
+              <div className="flex items-center gap-2 min-w-0" title="Press Esc to close open modals">
+                <kbd className="w-9 h-5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[9px] text-md-on-surface flex items-center justify-center shrink-0">
+                  Esc
+                </kbd>
+                <span className="truncate">Modals</span>
+              </div>
+              <div className="flex items-center gap-2 min-w-0" title="Press [ to toggle sidebar">
+                <kbd className="w-9 h-5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                  [
+                </kbd>
+                <span className="truncate">Sidebar</span>
+              </div>
+              <div className="flex items-center gap-2 min-w-0" title="Press D, L, or S to switch theme">
+                <kbd className="w-9 h-5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[8.5px] text-md-on-surface flex items-center justify-center shrink-0 tracking-tighter">
+                  D/L/S
+                </kbd>
+                <span className="truncate">Theme</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -318,7 +344,7 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
             <button
               onClick={onToggleLens}
               className="w-9 h-9 rounded-full bg-[#EFE7DC] dark:bg-[#282A35] hover:bg-[#E8DDD0] dark:hover:bg-[#313442] text-md-on-surface-variant hover:text-md-on-surface flex items-center justify-center transition-all shadow-xs"
-              title="Close (Esc or ])"
+              title="Close (])"
             >
               <X className="w-4 h-4" />
             </button>
@@ -366,7 +392,7 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 </div>
               )}
 
-              <form onSubmit={handleInlinePasscodeSubmit} className="w-full space-y-2.5 mb-4">
+              <form onSubmit={handleInlinePasscodeSubmit} className="w-full space-y-2.5 mb-1">
                 <input
                   type="password"
                   placeholder="Enter App Passcode..."
@@ -388,13 +414,23 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                 </button>
               </form>
 
+              {/* Prominent OR Divider */}
+              <div className="relative my-3.5 flex items-center justify-center w-full">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-md-outline-variant/35 dark:border-white/[0.1]" />
+                </div>
+                <span className="relative bg-[#FAF6F0] dark:bg-[#1E202B] px-3 text-[11px] font-bold tracking-widest text-md-on-surface-variant/80 uppercase">
+                  or
+                </span>
+              </div>
+
               {onOpenSettings && (
                 <button
                   onClick={onOpenSettings}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-md-primary hover:bg-md-primary-container/30 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-semibold text-md-primary hover:bg-md-primary-container/30 transition-colors"
                 >
-                  <Settings2 className="w-3.5 h-3.5" />
-                  <span>Configure API Key in Preferences</span>
+                  <Settings2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Configure your own API Key in Preferences</span>
                 </button>
               )}
             </div>
@@ -473,6 +509,26 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
                       Unlock &amp; Synthesize
                     </button>
                   </form>
+
+                  {/* Prominent OR Divider */}
+                  <div className="relative my-3.5 flex items-center justify-center w-full">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-md-outline-variant/35 dark:border-white/[0.1]" />
+                    </div>
+                    <span className="relative bg-[#FAF6F0] dark:bg-[#1A1C23] px-3 text-[11px] font-bold tracking-widest text-md-on-surface-variant/80 uppercase">
+                      or
+                    </span>
+                  </div>
+
+                  {onOpenSettings && (
+                    <button
+                      onClick={onOpenSettings}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-semibold text-md-primary hover:bg-md-primary-container/30 transition-colors"
+                    >
+                      <Settings2 className="w-3.5 h-3.5 shrink-0" />
+                      <span>Configure your own API Key in Preferences</span>
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="py-12 text-center flex flex-col items-center">

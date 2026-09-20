@@ -55,8 +55,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-[#FAF6F0] dark:bg-[#1E202B] border border-md-outline-variant/30 dark:border-white/[0.08] rounded-3xl w-full max-w-md shadow-popover dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-[#FAF6F0] dark:bg-[#1E202B] border border-md-outline-variant/30 dark:border-white/[0.08] rounded-3xl w-full max-w-md shadow-popover dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col"
+      >
         {/* Header */}
         <div className="px-6 py-5 border-b border-md-outline-variant/20 dark:border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -226,8 +232,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <div className="h-px bg-md-outline-variant/20 dark:bg-white/[0.06] w-full" />
 
+          {/* Keyboard Shortcuts Legend */}
+          <div className="space-y-3">
+            <h4 className="text-[11.5px] font-bold text-md-on-surface-variant uppercase tracking-wider">
+              Keyboard Shortcuts
+            </h4>
+
+            <div className="p-3.5 bg-[#F4EAE0] dark:bg-[#151720] border border-md-outline-variant/25 dark:border-white/[0.06] rounded-2xl grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
+              <div className="flex items-center gap-2">
+                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[10px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0">F</kbd>
+                <span className="text-md-on-surface-variant">Last 7 Days</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[10px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0">⌘K</kbd>
+                <span className="text-md-on-surface-variant">Search</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[10px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0">[</kbd>
+                <span className="text-md-on-surface-variant">Toggle sidebar</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[10px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0">]</kbd>
+                <span className="text-md-on-surface-variant">Toggle PM Lens</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[8.5px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0 tracking-tighter">D/L/S</kbd>
+                <span className="text-md-on-surface-variant">Theme switch</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="w-9 h-5 bg-white dark:bg-[#282A38] rounded-md font-mono font-bold text-[9px] text-md-on-surface shadow-2xs flex items-center justify-center shrink-0">Esc</kbd>
+                <span className="text-md-on-surface-variant">Close modal</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-md-outline-variant/20 dark:bg-white/[0.06] w-full" />
+
           {/* Cache */}
-          <div className="pt-2 flex items-center justify-between">
+          <div className="pt-1 flex items-center justify-between">
             <div>
               <h4 className="text-[13px] font-semibold text-md-on-surface">
                 Local AI Cache

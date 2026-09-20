@@ -5,6 +5,34 @@ const FEEDS_STORAGE_KEY = "strategic_rss_feeds_v1";
 const SYNTHESIS_CACHE_KEY = "strategic_rss_synthesis_cache_v1";
 const API_KEY_STORAGE_KEY = "strategic_rss_gemini_key_v1";
 const THEME_STORAGE_KEY = "strategic_rss_theme_v1";
+const ARTICLES_CACHE_KEY = "strategic_rss_cached_articles_v1";
+
+export function loadCachedArticles(): import("@/types").ArticleItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(ARTICLES_CACHE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((a) => a && !a.id?.startsWith("sample-"));
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCachedArticles(articles: import("@/types").ArticleItem[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    const clean = articles.filter((a) => a && !a.id?.startsWith("sample-"));
+    if (clean.length === 0) return;
+    // Cache up to 300 articles without overflowing storage limits
+    localStorage.setItem(ARTICLES_CACHE_KEY, JSON.stringify(clean.slice(0, 300)));
+  } catch (err) {
+    console.error("Failed to cache articles:", err);
+  }
+}
 
 export function loadSavedFeeds(): FeedSource[] {
   if (typeof window === "undefined") return DEFAULT_FEEDS;
@@ -17,7 +45,11 @@ export function loadSavedFeeds(): FeedSource[] {
       const customOrModified = new Map(parsed.map((f: FeedSource) => [f.id, f]));
       return DEFAULT_FEEDS.map((def) => {
         if (customOrModified.has(def.id)) {
-          return { ...def, ...customOrModified.get(def.id) };
+          const saved = customOrModified.get(def.id)!;
+          if (def.id === "paul-graham" && saved.url?.includes("filipesilva")) {
+            saved.url = def.url;
+          }
+          return { ...def, ...saved };
         }
         return def;
       }).concat(parsed.filter((p: FeedSource) => p.isCustom));

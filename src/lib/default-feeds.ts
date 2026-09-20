@@ -111,7 +111,7 @@ export const DEFAULT_FEEDS: FeedSource[] = [
   {
     id: "paul-graham",
     name: "Paul Graham Essays",
-    url: "https://filipesilva.github.io/paulgraham-rss/feed.rss",
+    url: "https://anonyonoor.com/feeds/paul-graham",
     websiteUrl: "https://paulgraham.com",
     pillar: "mental_models",
     description: "First-principles thinking, independent thinking, and foundational tech essays.",

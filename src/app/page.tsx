@@ -12,6 +12,8 @@ import {
   saveApiKey,
   loadPasscode,
   savePasscode,
+  loadCachedArticles,
+  saveCachedArticles,
 } from "@/lib/storage";
 import { PillarFilter } from "@/components/PillarFilter";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -28,18 +30,22 @@ import {
   Compass,
   PanelLeftClose,
   PanelLeftOpen,
+  Calendar,
+  X,
+  Command,
 } from "lucide-react";
 import { usePreferences } from "@/hooks/usePreferences";
 import { SAMPLE_ARTICLES } from "@/lib/sample-articles";
 
 export default function HomePage() {
   const [feeds, setFeeds] = useState<FeedSource[]>(DEFAULT_FEEDS);
-  const [articles, setArticles] = useState<ArticleItem[]>(SAMPLE_ARTICLES);
-  const [isLoadingFeeds, setIsLoadingFeeds] = useState(false);
+  const [articles, setArticles] = useState<ArticleItem[]>([]);
+  const [isLoadingFeeds, setIsLoadingFeeds] = useState(true);
   const [feedErrors, setFeedErrors] = useState<string[]>([]);
   const [activePillar, setActivePillar] = useState<StrategicPillar>("all");
+  const [filterPast7Days, setFilterPast7Days] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>("sample-lenny-moats");
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [isMobileReaderOpen, setIsMobileReaderOpen] = useState(false);
   const [isFeedManagerOpen, setIsFeedManagerOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -51,18 +57,66 @@ export default function HomePage() {
   const { theme, setTheme, articleWidth, setArticleWidth } = usePreferences();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const fetchFeeds = useCallback(async (currentFeeds: FeedSource[]) => {
+    setIsLoadingFeeds(true);
+    setFeedErrors([]);
+    try {
+      const sourcesToFetch = currentFeeds && currentFeeds.length > 0 ? currentFeeds : DEFAULT_FEEDS;
+      const res = await fetch("/api/feeds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sources: sourcesToFetch }),
+      });
+      const data = await res.json();
+      const raw: ArticleItem[] = data.articles || [];
+      const cached = loadSynthesisCache();
+      const liveEnriched = raw.map((a) => ({ ...a, synthesis: cached[a.id] || undefined }));
+      
+      if (liveEnriched.length > 0) {
+        setArticles(liveEnriched);
+        saveCachedArticles(liveEnriched);
+        setSelectedArticleId((prev) => {
+          if (prev && liveEnriched.some((a) => a.id === prev)) return prev;
+          return liveEnriched[0]?.id || null;
+        });
+      } else {
+        // Fallback only if both live feeds and local cached articles are completely empty
+        setArticles((prev) => (prev.length > 0 ? prev : SAMPLE_ARTICLES));
+      }
+
+      if (data.errors?.length) {
+        setFeedErrors(data.errors.map((e: any) => `${e.sourceId}: ${e.error}`));
+      }
+    } catch (err: any) {
+      setFeedErrors([err.message || "Failed to load feeds."]);
+    } finally {
+      setIsLoadingFeeds(false);
+    }
+  }, []);
+
   useEffect(() => {
     const loaded = loadSavedFeeds();
-    setFeeds(loaded && loaded.length > 0 ? loaded : DEFAULT_FEEDS);
+    const effectiveFeeds = loaded && loaded.length > 0 ? loaded : DEFAULT_FEEDS;
+    setFeeds(effectiveFeeds);
     setApiKey(loadApiKey());
     setPasscode(loadPasscode());
+
+    const cached = loadCachedArticles();
+    if (cached.length > 0) {
+      setArticles(cached);
+      setSelectedArticleId((prev) => prev || cached[0].id);
+    }
+
     const savedSidebar = localStorage.getItem("rss_sidebar_open");
     if (savedSidebar !== null) {
       setIsSidebarOpen(savedSidebar === "true");
     }
-  }, []);
+
+    fetchFeeds(effectiveFeeds);
+  }, [fetchFeeds]);
 
   // Keyboard shortcut listener:
+  // - 'f' / 'F': toggle last 7 days filter
   // - '[': toggle sidebar
   // - ']': toggle PM Lens
   // - 'd': dark mode
@@ -80,18 +134,43 @@ export default function HomePage() {
       }
 
       const target = e.target as HTMLElement;
+
+      if (e.key === "Escape") {
+        if (isSettingsOpen || isFeedManagerOpen) {
+          e.preventDefault();
+          if (target && typeof target.blur === "function") {
+            target.blur();
+          }
+          setIsSettingsOpen(false);
+          setIsFeedManagerOpen(false);
+          return;
+        }
+
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        ) {
+          target.blur();
+          return;
+        }
+        return;
+      }
+
       if (
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
         target.isContentEditable
       ) {
-        if (e.key === "Escape") {
-          (target as HTMLInputElement).blur();
-        }
         return;
       }
 
-      if (e.key === "[") {
+      if (e.key === "f" || e.key === "F") {
+        if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          setFilterPast7Days((prev) => !prev);
+        }
+      } else if (e.key === "[") {
         e.preventDefault();
         setIsSidebarOpen((prev) => {
           const next = !prev;
@@ -101,8 +180,6 @@ export default function HomePage() {
       } else if (e.key === "]") {
         e.preventDefault();
         setIsLensOpen((prev) => !prev);
-      } else if (e.key === "Escape") {
-        if (isLensOpen) setIsLensOpen(false);
       } else if (!e.metaKey && !e.ctrlKey && !e.altKey) {
         if (e.key === "d" || e.key === "D") {
           e.preventDefault();
@@ -119,7 +196,7 @@ export default function HomePage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLensOpen, setTheme]);
+  }, [isSettingsOpen, isFeedManagerOpen, setTheme]);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen((prev) => {
@@ -138,42 +215,6 @@ export default function HomePage() {
     }
   };
 
-  const fetchFeeds = useCallback(async (currentFeeds: FeedSource[]) => {
-    setIsLoadingFeeds(true);
-    setFeedErrors([]);
-    try {
-      const sourcesToFetch = currentFeeds && currentFeeds.length > 0 ? currentFeeds : DEFAULT_FEEDS;
-      const res = await fetch("/api/feeds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sources: sourcesToFetch }),
-      });
-      const data = await res.json();
-      const raw: ArticleItem[] = data.articles || [];
-      const cached = loadSynthesisCache();
-      const liveEnriched = raw.map((a) => ({ ...a, synthesis: cached[a.id] || undefined }));
-      
-      const merged = liveEnriched.length > 0
-        ? [...liveEnriched, ...SAMPLE_ARTICLES.filter((s) => !liveEnriched.some((l) => l.id === s.id))]
-        : SAMPLE_ARTICLES;
-
-      setArticles(merged);
-      if (merged.length > 0 && !selectedArticleId) {
-        setSelectedArticleId(merged[0].id);
-      }
-      if (data.errors?.length) {
-        setFeedErrors(data.errors.map((e: any) => `${e.sourceId}: ${e.error}`));
-      }
-    } catch (err: any) {
-      setFeedErrors([err.message || "Failed to load feeds."]);
-    } finally {
-      setIsLoadingFeeds(false);
-    }
-  }, [selectedArticleId]);
-
-  useEffect(() => {
-    fetchFeeds(feeds);
-  }, [fetchFeeds, feeds]);
 
   const handleSynthesize = async (
     article: ArticleItem,
@@ -250,6 +291,7 @@ export default function HomePage() {
   };
 
   const filteredArticles = useMemo(() => {
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     return articles.filter((a) => {
       const matchPillar = activePillar === "all" || a.pillar === activePillar;
       const matchSearch =
@@ -257,9 +299,27 @@ export default function HomePage() {
         a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.contentSnippet.toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.sourceName.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchPillar && matchSearch;
+
+      const matchDate = !filterPast7Days || (() => {
+        if (!a.publishedAt) return false;
+        const t = new Date(a.publishedAt).getTime();
+        return !isNaN(t) && t >= sevenDaysAgo;
+      })();
+
+      return matchPillar && matchSearch && matchDate;
     });
-  }, [articles, activePillar, searchQuery]);
+  }, [articles, activePillar, searchQuery, filterPast7Days]);
+
+  const past7DaysCount = useMemo(() => {
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return articles.filter((a) => {
+      const matchPillar = activePillar === "all" || a.pillar === activePillar;
+      if (!matchPillar) return false;
+      if (!a.publishedAt) return false;
+      const t = new Date(a.publishedAt).getTime();
+      return !isNaN(t) && t >= sevenDaysAgo;
+    }).length;
+  }, [articles, activePillar]);
 
   const pillarCounts = useMemo(() => {
     const c: Record<StrategicPillar, number> = {
@@ -274,6 +334,17 @@ export default function HomePage() {
     });
     return c;
   }, [articles]);
+
+  // Keep selected article in sync when filters change
+  useEffect(() => {
+    if (filteredArticles.length > 0) {
+      if (!selectedArticleId || !filteredArticles.some((a) => a.id === selectedArticleId)) {
+        setSelectedArticleId(filteredArticles[0].id);
+      }
+    } else {
+      setSelectedArticleId(null);
+    }
+  }, [filteredArticles, selectedArticleId]);
 
   const activeArticle = useMemo(
     () => articles.find((a) => a.id === selectedArticleId) || null,
@@ -330,6 +401,50 @@ export default function HomePage() {
               onSelectPillar={setActivePillar}
               counts={pillarCounts}
             />
+
+            {/* Recency Quick Filter in Sidebar */}
+            <div className="mt-4 pt-3 px-2 border-t border-md-outline-variant/15 dark:border-white/[0.05]">
+              <div className="px-2 mb-1.5 flex items-center justify-between text-[10.5px] font-bold text-md-on-surface-variant tracking-wider uppercase">
+                <span>Timeframe</span>
+                {filterPast7Days && (
+                  <button
+                    onClick={() => setFilterPast7Days(false)}
+                    className="text-[10px] lowercase text-md-primary hover:underline font-semibold"
+                  >
+                    reset
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => setFilterPast7Days((prev) => !prev)}
+                title="Toggle filter for articles published in the last 7 days (F)"
+                className={`group relative flex items-center justify-between w-full px-3.5 py-2.5 rounded-2xl text-[13.5px] font-semibold transition-all duration-200 ease-m3-standard ${
+                  filterPast7Days
+                    ? "bg-md-primary text-white dark:text-[#250F08] shadow-sm font-bold"
+                    : "text-md-on-surface hover:bg-md-surface-container dark:hover:bg-[#252731]"
+                }`}
+              >
+                <div className="flex items-center gap-3 min-w-0 pr-2">
+                  <Calendar
+                    className={`w-4 h-4 shrink-0 transition-colors duration-200 ${
+                      filterPast7Days
+                        ? "text-white dark:text-[#250F08]"
+                        : "text-md-on-surface-variant group-hover:text-md-on-surface"
+                    }`}
+                  />
+                  <span className="whitespace-nowrap tracking-tight">Last 7 Days</span>
+                </div>
+                <span
+                  className={`min-w-[22px] h-[22px] px-1.5 rounded-full text-[11px] font-black tabular-nums shrink-0 flex items-center justify-center transition-all ${
+                    filterPast7Days
+                      ? "bg-white text-[#8F2C10] shadow-xs dark:bg-[#250F08] dark:text-[#FFC4B4]"
+                      : "text-md-on-surface-variant group-hover:text-md-on-surface"
+                  }`}
+                >
+                  {past7DaysCount}
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Bottom Toolbar: Sources & Preferences Pills */}
@@ -361,6 +476,52 @@ export default function HomePage() {
                 <span className="w-2 h-2 rounded-full bg-md-primary shadow-xs" />
               )}
             </button>
+
+            {/* Aesthetic, Symmetric Shortcuts Panel */}
+            <div className="mt-2.5 p-3 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.04]">
+              <div className="flex items-center gap-1.5 mb-2.5 px-0.5 text-[10.5px] font-bold text-md-on-surface-variant/70 uppercase tracking-wider">
+                <Command className="w-3 h-3 opacity-60" />
+                <span>Shortcuts</span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-2.5 gap-y-2 text-[11px] text-md-on-surface-variant">
+                <div className="flex items-center gap-1.5 min-w-0" title="Press ⌘K to search">
+                  <kbd className="min-w-[20px] h-5 px-1.5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                    ⌘K
+                  </kbd>
+                  <span className="truncate">Search</span>
+                </div>
+                <div className="flex items-center gap-1.5 min-w-0" title="Press ] to toggle PM Lens">
+                  <kbd className="min-w-[20px] h-5 px-1.5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                    ]
+                  </kbd>
+                  <span className="truncate">PM Lens</span>
+                </div>
+                <div className="flex items-center gap-1.5 min-w-0" title="Press F to toggle Last 7 Days">
+                  <kbd className="min-w-[20px] h-5 px-1.5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                    F
+                  </kbd>
+                  <span className="truncate">7 Days</span>
+                </div>
+                <div className="flex items-center gap-1.5 min-w-0" title="Press Esc to close open modals">
+                  <kbd className="min-w-[20px] h-5 px-1.5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[9.5px] text-md-on-surface flex items-center justify-center shrink-0">
+                    Esc
+                  </kbd>
+                  <span className="truncate">Modals</span>
+                </div>
+                <div className="flex items-center gap-1.5 min-w-0" title="Press [ to toggle sidebar">
+                  <kbd className="min-w-[20px] h-5 px-1.5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[10px] text-md-on-surface flex items-center justify-center shrink-0">
+                    [
+                  </kbd>
+                  <span className="truncate">Sidebar</span>
+                </div>
+                <div className="flex items-center gap-1.5 min-w-0" title="Press D, L, or S to switch theme">
+                  <kbd className="min-w-[20px] h-5 px-1.5 rounded-md bg-white dark:bg-[#252836] border border-black/10 dark:border-white/[0.08] shadow-2xs font-mono font-bold text-[9px] text-md-on-surface flex items-center justify-center shrink-0">
+                    D/L/S
+                  </kbd>
+                  <span className="truncate">Theme</span>
+                </div>
+              </div>
+            </div>
           </div>
         </aside>
 
@@ -410,14 +571,65 @@ export default function HomePage() {
             </button>
           </div>
 
+          {/* Quick Filters Pill Bar */}
+          <div className="px-3.5 pb-2.5 pt-0.5 flex items-center justify-between gap-2 shrink-0 border-b border-md-outline-variant/20 dark:border-white/[0.04]">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              <button
+                onClick={() => setFilterPast7Days((prev) => !prev)}
+                className={`h-7 px-3 rounded-full text-[11.5px] transition-all inline-flex items-center gap-1.5 shadow-2xs ${
+                  filterPast7Days
+                    ? "bg-md-primary text-white dark:text-[#260B03] shadow-xs font-bold"
+                    : "bg-white dark:bg-[#22242E] text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container dark:hover:bg-[#2A2C38] border border-md-outline-variant/30 dark:border-transparent"
+                }`}
+                title="Toggle filter for articles published in the last 7 days (F)"
+              >
+                <Calendar className={`w-3.5 h-3.5 shrink-0 ${filterPast7Days ? "text-white dark:text-[#260B03]" : ""}`} />
+                <span className={filterPast7Days ? "text-white dark:text-[#260B03] font-bold dark:font-extrabold" : ""}>Last 7 Days</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-black tabular-nums leading-none transition-all ${
+                    filterPast7Days
+                      ? "bg-white text-[#8F2C10] shadow-xs dark:bg-[#250F08] dark:text-[#FFC4B4]"
+                      : "bg-[#EAE0D3] dark:bg-[#2E3140] text-md-on-surface-variant font-bold"
+                  }`}
+                >
+                  {past7DaysCount}
+                </span>
+              </button>
+            </div>
+
+            {filterPast7Days && (
+              <button
+                onClick={() => setFilterPast7Days(false)}
+                className="text-[11px] font-semibold text-md-primary hover:text-md-primary/80 transition-colors flex items-center gap-0.5 shrink-0 px-1"
+                title="Clear quick filter"
+              >
+                <X className="w-3 h-3" />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+
           {/* Feed List Items */}
           <div className="flex-1 overflow-y-auto py-1">
             {isLoadingFeeds && articles.length === 0 ? (
-              <div className="py-24 flex flex-col items-center justify-center gap-3 text-center px-6">
-                <Loader2 className="w-6 h-6 animate-spin text-md-primary" />
-                <p className="text-[13px] font-semibold text-md-on-surface">
-                  Loading strategic dispatches...
-                </p>
+              <div className="p-3 space-y-2.5 animate-pulse">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    className="p-5 rounded-2xl bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.03] dark:border-white/[0.03] space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 w-28 bg-black/10 dark:bg-white/10 rounded-full" />
+                      <div className="h-3.5 w-3.5 bg-black/10 dark:bg-white/10 rounded-full" />
+                    </div>
+                    <div className="h-4 w-5/6 bg-black/10 dark:bg-white/10 rounded-md" />
+                    <div className="h-3.5 w-3/5 bg-black/10 dark:bg-white/10 rounded-md" />
+                    <div className="flex items-center gap-3 pt-1">
+                      <div className="h-3 w-16 bg-black/10 dark:bg-white/10 rounded-md" />
+                      <div className="h-3 w-12 bg-black/10 dark:bg-white/10 rounded-md" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : filteredArticles.length === 0 ? (
               <div className="py-20 text-center px-6">
@@ -425,8 +637,20 @@ export default function HomePage() {
                   <Inbox className="w-6 h-6 text-md-on-surface-variant/50" />
                 </div>
                 <p className="text-[14px] font-bold text-md-on-surface">
-                  {searchQuery ? `No results for "${searchQuery}"` : "Inbox Zero"}
+                  {searchQuery
+                    ? `No results for "${searchQuery}"`
+                    : filterPast7Days
+                    ? "No dispatches in the last 7 days"
+                    : "Inbox Zero"}
                 </p>
+                {filterPast7Days && (
+                  <button
+                    onClick={() => setFilterPast7Days(false)}
+                    className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-semibold text-md-primary bg-md-primary-container/40 hover:bg-md-primary-container transition-colors"
+                  >
+                    <span>Show all dispatches</span>
+                  </button>
+                )}
               </div>
             ) : (
               filteredArticles.map((a) => (

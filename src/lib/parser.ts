@@ -168,10 +168,15 @@ export async function fetchAndParseFeed(
   try {
     let rawItems: any[] = [];
 
+    let feedUrl = source.url;
+    if (source.id === "paul-graham" && feedUrl.includes("filipesilva")) {
+      feedUrl = "https://anonyonoor.com/feeds/paul-graham";
+    }
+
     // For high-frequency WordPress feeds like SaaStr, fetch up to 4 pages in parallel
     // to capture in-depth teardowns and "5 Interesting Learnings" without being drowned out by short daily posts
-    if (source.url.includes("saastr.com")) {
-      const baseUrl = source.url.split("?")[0].replace(/\/$/, "");
+    if (feedUrl.includes("saastr.com")) {
+      const baseUrl = feedUrl.split("?")[0].replace(/\/$/, "");
       const urls = [
         `${baseUrl}/`,
         `${baseUrl}/?paged=2`,
@@ -183,13 +188,13 @@ export async function fetchAndParseFeed(
         rawItems.push(...parseRawXmlItems(xml));
       }
     } else {
-      const xml = await fetchRawXml(source.url);
+      const xml = await fetchRawXml(feedUrl);
       rawItems = parseRawXmlItems(xml);
 
-      // Auto-Discovery fallback: If rawItems is empty, check if source.url is a website with a hidden RSS feed
+      // Auto-Discovery fallback: If rawItems is empty, check if feedUrl is a website with a hidden RSS feed
       if (rawItems.length === 0) {
-        const discovered = await discoverFeedUrl(source.url);
-        if (discovered && discovered.feedUrl && discovered.feedUrl !== source.url) {
+        const discovered = await discoverFeedUrl(feedUrl);
+        if (discovered && discovered.feedUrl && discovered.feedUrl !== feedUrl) {
           const discXml = await fetchRawXml(discovered.feedUrl);
           rawItems = parseRawXmlItems(discXml);
         }
@@ -230,16 +235,35 @@ export async function fetchAndParseFeed(
         item.published ||
         item.updated ||
         item["dc:date"] ||
-        new Date().toISOString();
+        "";
 
-      let publishedAt = new Date().toISOString();
-      try {
-        const d = new Date(pubDateRaw);
-        if (!isNaN(d.getTime())) {
-          publishedAt = d.toISOString();
+      let publishedAt = "";
+      if (pubDateRaw) {
+        try {
+          const d = new Date(pubDateRaw);
+          if (!isNaN(d.getTime())) {
+            publishedAt = d.toISOString();
+          }
+        } catch {
+          publishedAt = "";
         }
-      } catch {
-        publishedAt = new Date().toISOString();
+      }
+
+      // If missing date, try to extract publication date from content or description
+      if (!publishedAt && rawContent) {
+        const dateMatch = rawContent.match(
+          /\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})\b/i
+        );
+        if (dateMatch) {
+          try {
+            const d = new Date(`${dateMatch[1]} 1, ${dateMatch[2]}`);
+            if (!isNaN(d.getTime())) {
+              publishedAt = d.toISOString();
+            }
+          } catch {
+            // ignore
+          }
+        }
       }
 
       const rawAuthor =
