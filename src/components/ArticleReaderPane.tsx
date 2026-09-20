@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ArticleItem } from "@/types";
 import { StrategicSynthesisCard } from "./StrategicSynthesisCard";
 import {
@@ -51,6 +51,23 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
   const [inlinePasscode, setInlinePasscode] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
+
+  const articleScrollRef = useRef<HTMLDivElement>(null);
+  const inspectorScrollRef = useRef<HTMLDivElement>(null);
+  const mobileSheetScrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll position to the top whenever active article changes
+  useEffect(() => {
+    if (articleScrollRef.current) {
+      articleScrollRef.current.scrollTop = 0;
+    }
+    if (inspectorScrollRef.current) {
+      inspectorScrollRef.current.scrollTop = 0;
+    }
+    if (mobileSheetScrollRef.current) {
+      mobileSheetScrollRef.current.scrollTop = 0;
+    }
+  }, [article?.id]);
 
   // Polished M3 Empty State Workspace Card
   if (!article) {
@@ -173,7 +190,11 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
           </a>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div
+          key={article.id}
+          ref={articleScrollRef}
+          className="flex-1 overflow-y-auto"
+        >
           <div
             className={`mx-auto px-6 sm:px-14 pt-3 pb-12 transition-all duration-300 ease-m3-standard ${maxWidthClass}`}
           >
@@ -305,7 +326,11 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
         </div>
 
         {/* Inspector Scrollable Body */}
-        <div className="flex-1 overflow-y-auto px-5 pb-5 pt-1">
+        <div
+          key={article.id}
+          ref={inspectorScrollRef}
+          className="flex-1 overflow-y-auto px-5 pb-5 pt-1"
+        >
           {isSynthesizing || isVerifying ? (
             <div className="py-28 flex flex-col items-center justify-center text-center">
               <div className="w-12 h-12 rounded-full bg-md-primary-container/40 flex items-center justify-center mb-4 shadow-sm">
@@ -410,7 +435,11 @@ export const ArticleReaderPane: React.FC<ArticleReaderPaneProps> = ({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 pb-5">
+            <div
+              key={article.id}
+              ref={mobileSheetScrollRef}
+              className="flex-1 overflow-y-auto px-5 pb-5"
+            >
               {isSynthesizing || isVerifying ? (
                 <div className="py-20 flex flex-col items-center justify-center text-center">
                   <Loader2 className="w-6 h-6 animate-spin text-md-primary mb-3" />
